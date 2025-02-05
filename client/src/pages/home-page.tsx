@@ -2,8 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles } from "lucide-react";
+import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -27,15 +30,27 @@ const staggerChildren = {
 
 export default function HomePage() {
   const { user, logoutMutation } = useAuth();
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
 
   const scrollToServices = () => {
     document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send this to your backend
+    toast({
+      title: "Success!",
+      description: "Your career guide is on its way to your inbox!",
+    });
+    setEmail("");
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="border-b sticky top-0 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 z-50">
+      <nav className="border-b fixed w-full top-0 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <div className="font-serif text-xl font-bold text-primary">RESUMATE</div>
@@ -75,7 +90,7 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <motion.section 
-        className="relative overflow-hidden py-20 lg:py-32"
+        className="relative min-h-screen flex items-center pt-16"
         initial="initial"
         animate="animate"
         variants={staggerChildren}
@@ -137,6 +152,42 @@ export default function HomePage() {
         </div>
       </motion.section>
 
+      {/* Free Resource Section */}
+      <motion.section 
+        className="py-24 bg-gradient-to-b from-background to-muted"
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        variants={staggerChildren}
+      >
+        <div className="container mx-auto px-4">
+          <motion.div 
+            className="max-w-4xl mx-auto text-center"
+            variants={fadeIn}
+          >
+            <h2 className="text-3xl font-serif font-bold mb-4">Get Your Free Career Guide</h2>
+            <p className="text-muted-foreground mb-8">
+              Download our comprehensive guide packed with insider tips for crafting 
+              the perfect CV and acing your interviews.
+            </p>
+            <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1"
+                required
+              />
+              <Button type="submit" className="uppercase-spaced">
+                <Mail className="w-4 h-4 mr-2" />
+                GET FREE GUIDE
+              </Button>
+            </form>
+          </motion.div>
+        </div>
+      </motion.section>
+
       {/* Services Section */}
       <motion.section 
         id="services" 
@@ -173,7 +224,6 @@ export default function HomePage() {
                     <FileText className="w-6 h-6 text-primary" />
                   </div>
                   <CardTitle className="font-serif">CV REVIEW</CardTitle>
-                  <div className="text-3xl font-bold mt-2">$49<span className="text-lg text-muted-foreground">/review</span></div>
                   <CardDescription>
                     Professional CV Review & Feedback
                   </CardDescription>
@@ -250,7 +300,6 @@ export default function HomePage() {
                     <Users className="w-6 h-6 text-primary" />
                   </div>
                   <CardTitle className="font-serif">CONSULTATION</CardTitle>
-                  <div className="text-3xl font-bold mt-2">$99<span className="text-lg text-muted-foreground">/hour</span></div>
                   <CardDescription>
                     One-on-One Career Guidance
                   </CardDescription>
