@@ -3,13 +3,44 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { SiTarget } from "react-icons/si";
-import { BookOpen, FileText, Users } from "lucide-react";
+import { BookOpen, FileText, Users, LogOut } from "lucide-react";
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, logoutMutation } = useAuth();
+
+  const scrollToServices = () => {
+    document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen">
+      {/* Navigation */}
+      {user && (
+        <nav className="bg-background border-b p-4">
+          <div className="container mx-auto flex justify-between items-center">
+            <span className="font-semibold">Welcome, {user.username}</span>
+            <div className="space-x-4">
+              <Button variant="outline" asChild>
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+              {user.isAdmin && (
+                <Button variant="outline" asChild>
+                  <Link href="/admin">Admin Panel</Link>
+                </Button>
+              )}
+              <Button 
+                variant="ghost" 
+                onClick={() => logoutMutation.mutate()}
+                disabled={logoutMutation.isPending}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </nav>
+      )}
+
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-background to-muted py-20">
         <div className="container mx-auto px-4">
@@ -24,7 +55,7 @@ export default function HomePage() {
               <Button size="lg" asChild>
                 <Link href={user ? "/dashboard" : "/auth"}>Get Started</Link>
               </Button>
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" onClick={scrollToServices}>
                 Learn More
               </Button>
             </div>
@@ -33,7 +64,7 @@ export default function HomePage() {
       </section>
 
       {/* Services Section */}
-      <section className="py-20 bg-background">
+      <section id="services" className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             {/* CV Review Card */}
