@@ -8,7 +8,13 @@ import { motion } from "framer-motion";
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 }
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+};
+
+const slideIn = {
+  initial: { opacity: 0, x: -20 },
+  animate: { opacity: 1, x: 0 },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
 };
 
 const staggerChildren = {
@@ -32,19 +38,19 @@ export default function HomePage() {
       <nav className="border-b sticky top-0 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
-            <div className="font-bold text-xl text-primary">CV Expert</div>
+            <div className="font-serif text-xl font-bold text-primary">CV EXPERT</div>
             <div className="space-x-4">
               {user ? (
                 <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-sm text-muted-foreground uppercase-spaced">
                     Welcome, {user.username}
                   </span>
                   <Button variant="outline" asChild>
-                    <Link href="/dashboard">Dashboard</Link>
+                    <Link href="/dashboard">DASHBOARD</Link>
                   </Button>
                   {user.isAdmin && (
                     <Button variant="outline" asChild>
-                      <Link href="/admin">Admin Panel</Link>
+                      <Link href="/admin">ADMIN PANEL</Link>
                     </Button>
                   )}
                   <Button 
@@ -54,12 +60,12 @@ export default function HomePage() {
                     size="sm"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    LOGOUT
                   </Button>
                 </div>
               ) : (
-                <Button asChild className="bg-primary hover:bg-primary/90">
-                  <Link href="/auth">Get Started</Link>
+                <Button className="bg-primary hover:bg-primary/90" asChild>
+                  <Link href="/auth">GET STARTED</Link>
                 </Button>
               )}
             </div>
@@ -81,12 +87,18 @@ export default function HomePage() {
               variants={fadeIn}
             >
               <div className="space-y-6">
+                <motion.p 
+                  className="uppercase-spaced text-primary"
+                  variants={slideIn}
+                >
+                  PROFESSIONAL CV REVIEW SERVICE
+                </motion.p>
                 <motion.h1 
-                  className="text-5xl lg:text-7xl font-bold tracking-tight"
+                  className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
                 >
                   Stand Out with a
-                  <span className="text-primary"> Professional CV</span>
+                  <span className="gradient-text"> Professional CV</span>
                 </motion.h1>
                 <motion.p 
                   className="text-xl text-muted-foreground max-w-[600px] leading-relaxed"
@@ -99,18 +111,22 @@ export default function HomePage() {
                 className="flex flex-col sm:flex-row gap-4"
                 variants={fadeIn}
               >
-                <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90" asChild>
+                <Button 
+                  size="lg" 
+                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 uppercase-spaced" 
+                  asChild
+                >
                   <Link href={user ? "/dashboard" : "/auth"}>
-                    Get Started Today
+                    GET STARTED TODAY
                   </Link>
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
                   onClick={scrollToServices}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto uppercase-spaced"
                 >
-                  See How It Works
+                  SEE HOW IT WORKS
                 </Button>
               </motion.div>
             </motion.div>
@@ -118,18 +134,21 @@ export default function HomePage() {
               className="flex-1 relative"
               variants={fadeIn}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl" />
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl"
+                animate={{
+                  scale: [1, 1.02, 1],
+                  rotate: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  repeatType: "reverse"
+                }}
+              />
               <div className="relative p-8">
                 <motion.div
-                  animate={{ 
-                    scale: [1, 1.02, 1],
-                    rotate: [0, 1, 0]
-                  }}
-                  transition={{ 
-                    duration: 3,
-                    repeat: Infinity,
-                    repeatType: "reverse"
-                  }}
+                  className="animate-float"
                 >
                   <FileText className="w-32 h-32 text-primary mx-auto" />
                 </motion.div>
@@ -153,9 +172,10 @@ export default function HomePage() {
             className="text-center mb-16"
             variants={fadeIn}
           >
-            <h2 className="text-4xl font-bold tracking-tight mb-4">Our Services</h2>
+            <p className="uppercase-spaced text-primary mb-4">OUR SERVICES</p>
+            <h2 className="text-4xl font-serif font-bold tracking-tight mb-4">Everything You Need</h2>
             <p className="text-muted-foreground max-w-[600px] mx-auto text-lg">
-              Everything you need to build a winning CV
+              Comprehensive tools and expertise to build your perfect CV
             </p>
           </motion.div>
           <motion.div 
@@ -163,13 +183,17 @@ export default function HomePage() {
             variants={staggerChildren}
           >
             {/* CV Review Card */}
-            <motion.div variants={fadeIn}>
+            <motion.div 
+              variants={fadeIn}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.3 }}
+            >
               <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <FileText className="w-6 h-6 text-primary" />
                   </div>
-                  <CardTitle>Expert CV Review</CardTitle>
+                  <CardTitle className="font-serif">EXPERT CV REVIEW</CardTitle>
                   <CardDescription>
                     Professional feedback from industry experts
                   </CardDescription>
@@ -189,21 +213,25 @@ export default function HomePage() {
                       48-hour turnaround time
                     </li>
                   </ul>
-                  <Button className="w-full bg-primary hover:bg-primary/90" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>Get Review</Link>
+                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
+                    <Link href={user ? "/dashboard" : "/auth"}>GET REVIEW</Link>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
 
             {/* Digital Products Card */}
-            <motion.div variants={fadeIn}>
+            <motion.div 
+              variants={fadeIn}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.3 }}
+            >
               <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <BookOpen className="w-6 h-6 text-primary" />
                   </div>
-                  <CardTitle>Premium Templates</CardTitle>
+                  <CardTitle className="font-serif">PREMIUM TEMPLATES</CardTitle>
                   <CardDescription>
                     Professional templates and guides
                   </CardDescription>
@@ -223,21 +251,25 @@ export default function HomePage() {
                       Easy-to-use guides
                     </li>
                   </ul>
-                  <Button className="w-full bg-primary hover:bg-primary/90" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>Get Templates</Link>
+                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
+                    <Link href={user ? "/dashboard" : "/auth"}>GET TEMPLATES</Link>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
 
             {/* Consultation Card */}
-            <motion.div variants={fadeIn}>
+            <motion.div 
+              variants={fadeIn}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.3 }}
+            >
               <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <Users className="w-6 h-6 text-primary" />
                   </div>
-                  <CardTitle>Career Consultation</CardTitle>
+                  <CardTitle className="font-serif">CAREER CONSULTATION</CardTitle>
                   <CardDescription>
                     One-on-one expert guidance
                   </CardDescription>
@@ -257,8 +289,8 @@ export default function HomePage() {
                       Interview preparation
                     </li>
                   </ul>
-                  <Button className="w-full bg-primary hover:bg-primary/90" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>Book Session</Link>
+                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
+                    <Link href={user ? "/dashboard" : "/auth"}>BOOK SESSION</Link>
                   </Button>
                 </CardContent>
               </Card>
