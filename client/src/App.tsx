@@ -8,6 +8,7 @@ import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AdminPage from "@/pages/admin-page";
+import ResourceLibraryPage from "@/pages/resource-library-page";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/admin" component={AdminPage} />
+      <Route path="/resources" component={ResourceLibraryPage} />
       <Route component={NotFound} />
     </Switch>
   );
