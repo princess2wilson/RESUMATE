@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { BookOpen, FileText, Users, LogOut } from "lucide-react";
+import { BookOpen, Users, LogOut, ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
 const fadeIn = {
@@ -38,7 +38,7 @@ export default function HomePage() {
       <nav className="border-b sticky top-0 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
-            <div className="font-serif text-xl font-bold text-primary">CV EXPERT</div>
+            <div className="font-serif text-xl font-bold text-primary">RESUMATE</div>
             <div className="space-x-4">
               {user ? (
                 <div className="flex items-center gap-4">
@@ -64,7 +64,7 @@ export default function HomePage() {
                   </Button>
                 </div>
               ) : (
-                <Button className="bg-primary hover:bg-primary/90" asChild>
+                <Button className="bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
                   <Link href="/auth">GET STARTED</Link>
                 </Button>
               )}
@@ -81,78 +81,58 @@ export default function HomePage() {
         variants={staggerChildren}
       >
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row items-center gap-12 max-w-6xl mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
             <motion.div 
               className="flex-1 space-y-8"
               variants={fadeIn}
             >
               <div className="space-y-6">
                 <motion.p 
-                  className="uppercase-spaced text-primary"
+                  className="uppercase-spaced text-primary flex items-center justify-center gap-2"
                   variants={slideIn}
                 >
-                  PROFESSIONAL CV REVIEW SERVICE
+                  <Sparkles className="w-5 h-5" />
+                  YOUR CAREER TRANSFORMATION STARTS HERE
                 </motion.p>
                 <motion.h1 
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
                 >
-                  Stand Out with a
-                  <span className="gradient-text"> Professional CV</span>
+                  Craft Your Perfect Story with
+                  <span className="gradient-text"> Resumate</span>
                 </motion.h1>
                 <motion.p 
-                  className="text-xl text-muted-foreground max-w-[600px] leading-relaxed"
+                  className="text-xl text-muted-foreground max-w-[800px] mx-auto leading-relaxed"
                   variants={fadeIn}
                 >
-                  Get expert feedback, access premium templates, and book personalized consultations to advance your career journey.
+                  Join thousands of professionals who've transformed their careers through our 
+                  expert-guided resume building platform. Get personalized feedback, access 
+                  premium templates, and connect with industry experts who understand your journey.
                 </motion.p>
               </div>
               <motion.div 
-                className="flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row gap-4 justify-center"
                 variants={fadeIn}
               >
                 <Button 
                   size="lg" 
                   className="w-full sm:w-auto bg-primary hover:bg-primary/90 uppercase-spaced" 
-                  asChild
+                  onClick={scrollToServices}
                 >
-                  <Link href={user ? "/dashboard" : "/auth"}>
-                    GET STARTED TODAY
-                  </Link>
+                  EXPLORE PLANS
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  onClick={scrollToServices}
+                  asChild
                   className="w-full sm:w-auto uppercase-spaced"
                 >
-                  SEE HOW IT WORKS
+                  <Link href="/auth">
+                    START FREE TRIAL
+                  </Link>
                 </Button>
               </motion.div>
-            </motion.div>
-            <motion.div 
-              className="flex-1 relative"
-              variants={fadeIn}
-            >
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl"
-                animate={{
-                  scale: [1, 1.02, 1],
-                  rotate: [0, 1, 0],
-                }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  repeatType: "reverse"
-                }}
-              />
-              <div className="relative p-8">
-                <motion.div
-                  className="animate-float"
-                >
-                  <FileText className="w-32 h-32 text-primary mx-auto" />
-                </motion.div>
-              </div>
             </motion.div>
           </div>
         </div>
@@ -172,55 +152,17 @@ export default function HomePage() {
             className="text-center mb-16"
             variants={fadeIn}
           >
-            <p className="uppercase-spaced text-primary mb-4">OUR SERVICES</p>
-            <h2 className="text-4xl font-serif font-bold tracking-tight mb-4">Everything You Need</h2>
+            <p className="uppercase-spaced text-primary mb-4">PRICING PLANS</p>
+            <h2 className="text-4xl font-serif font-bold tracking-tight mb-4">Choose Your Success Path</h2>
             <p className="text-muted-foreground max-w-[600px] mx-auto text-lg">
-              Comprehensive tools and expertise to build your perfect CV
+              Select a plan that fits your career goals and budget
             </p>
           </motion.div>
           <motion.div 
             className="grid md:grid-cols-3 gap-8"
             variants={staggerChildren}
           >
-            {/* CV Review Card */}
-            <motion.div 
-              variants={fadeIn}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <FileText className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="font-serif">EXPERT CV REVIEW</CardTitle>
-                  <CardDescription>
-                    Professional feedback from industry experts
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-sm text-muted-foreground mb-6">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Detailed analysis and scoring
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Industry-specific recommendations
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      48-hour turnaround time
-                    </li>
-                  </ul>
-                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>GET REVIEW</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Digital Products Card */}
+            {/* Basic Plan */}
             <motion.div 
               variants={fadeIn}
               whileHover={{ y: -5 }}
@@ -231,34 +173,81 @@ export default function HomePage() {
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <BookOpen className="w-6 h-6 text-primary" />
                   </div>
-                  <CardTitle className="font-serif">PREMIUM TEMPLATES</CardTitle>
+                  <CardTitle className="font-serif">STARTER</CardTitle>
+                  <div className="text-3xl font-bold mt-2">$29<span className="text-lg text-muted-foreground">/mo</span></div>
                   <CardDescription>
-                    Professional templates and guides
+                    Perfect for getting started
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3 text-sm text-muted-foreground mb-6">
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      ATS-optimized templates
+                      Basic CV templates
                     </li>
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Industry-specific formats
+                      1 CV review per month
                     </li>
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Easy-to-use guides
+                      Email support
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>GET TEMPLATES</Link>
+                    <Link href={user ? "/dashboard" : "/auth"}>GET STARTED</Link>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
 
-            {/* Consultation Card */}
+            {/* Pro Plan */}
+            <motion.div 
+              variants={fadeIn}
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="relative overflow-hidden border-2 border-primary hover:shadow-lg transition-all duration-300">
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm uppercase-spaced">
+                  Popular
+                </div>
+                <CardHeader>
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <Users className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="font-serif">PRO</CardTitle>
+                  <div className="text-3xl font-bold mt-2">$49<span className="text-lg text-muted-foreground">/mo</span></div>
+                  <CardDescription>
+                    For serious career builders
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 text-sm text-muted-foreground mb-6">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                      Premium CV templates
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                      Unlimited CV reviews
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                      2 consultation calls
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                      Priority support
+                    </li>
+                  </ul>
+                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
+                    <Link href={user ? "/dashboard" : "/auth"}>GET PRO</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Enterprise Plan */}
             <motion.div 
               variants={fadeIn}
               whileHover={{ y: -5 }}
@@ -267,30 +256,35 @@ export default function HomePage() {
               <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <Users className="w-6 h-6 text-primary" />
+                    <Sparkles className="w-6 h-6 text-primary" />
                   </div>
-                  <CardTitle className="font-serif">CAREER CONSULTATION</CardTitle>
+                  <CardTitle className="font-serif">ENTERPRISE</CardTitle>
+                  <div className="text-3xl font-bold mt-2">$99<span className="text-lg text-muted-foreground">/mo</span></div>
                   <CardDescription>
-                    One-on-one expert guidance
+                    Complete career transformation
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3 text-sm text-muted-foreground mb-6">
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      30-minute strategy session
+                      All Pro features
                     </li>
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Career path planning
+                      Weekly consultations
                     </li>
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Interview preparation
+                      LinkedIn optimization
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                      Career coaching
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>BOOK SESSION</Link>
+                    <Link href={user ? "/dashboard" : "/auth"}>GET ENTERPRISE</Link>
                   </Button>
                 </CardContent>
               </Card>

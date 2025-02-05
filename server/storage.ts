@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import * as schema from "@shared/schema";
+import { subscriptions, type Subscription } from "@shared/schema";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -25,6 +26,16 @@ export interface IStorage {
   getConsultations(userId: number): Promise<Consultation[]>;
 
   sessionStore: session.Store;
+
+  // Add new subscription methods
+  createSubscription(subscription: Omit<Subscription, "id">): Promise<Subscription>;
+  getSubscription(userId: number): Promise<Subscription | undefined>;
+  updateSubscription(
+    stripeSubscriptionId: string,
+    update: Partial<Subscription>
+  ): Promise<Subscription>;
+  getStripeCustomer(userId: number): Promise<{ id: string } | undefined>;
+  setStripeCustomer(userId: number, stripeCustomerId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -134,6 +145,47 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(schema.consultations)
       .where(eq(schema.consultations.userId, userId));
+  }
+
+  async createSubscription(subscription: Omit<Subscription, "id">): Promise<Subscription> {
+    const [newSubscription] = await db
+      .insert(subscriptions)
+      .values(subscription)
+      .returning();
+    return newSubscription;
+  }
+
+  async getSubscription(userId: number): Promise<Subscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, userId));
+    return subscription;
+  }
+
+  async updateSubscription(
+    stripeSubscriptionId: string,
+    update: Partial<Subscription>
+  ): Promise<Subscription> {
+    const [updated] = await db
+      .update(subscriptions)
+      .set(update)
+      .where(eq(subscriptions.stripeSubscriptionId, stripeSubscriptionId))
+      .returning();
+    return updated;
+  }
+
+  async getStripeCustomer(userId: number): Promise<{ id: string } | undefined> {
+    const [subscription] = await db
+      .select({ stripeCustomerId: subscriptions.stripeCustomerId })
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, userId));
+    return subscription ? { id: subscription.stripeCustomerId } : undefined;
+  }
+
+  async setStripeCustomer(userId: number, stripeCustomerId: string): Promise<void> {
+    // This is handled through createSubscription, no need for a separate table
+    return;
   }
 }
 
