@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
   googleId: text("google_id").unique(),
+  linkedinId: text("linkedin_id").unique(),
   email: text("email").unique(),
 });
 
@@ -52,11 +53,11 @@ export const subscriptions = pgTable("subscriptions", {
   currentPeriodEnd: text("current_period_end").notNull(),
 });
 
-// Schema exports
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   googleId: true,
+  linkedinId: true,
   email: true,
 });
 

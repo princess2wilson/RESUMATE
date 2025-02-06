@@ -1,6 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as LinkedInStrategy } from "passport-linkedin-oauth2";
 import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
@@ -96,6 +97,37 @@ export function setupAuth(app: Express) {
     )
   );
 
+  // LinkedIn Strategy
+  passport.use(
+    new LinkedInStrategy(
+      {
+        clientID: process.env.LINKEDIN_CLIENT_ID!,
+        clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+        callbackURL: "/api/auth/linkedin/callback",
+        scope: ["r_emailaddress", "r_liteprofile"],
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          let user = await storage.getUserByLinkedinId(profile.id);
+
+          if (!user) {
+            // Create new user if doesn't exist
+            user = await storage.createUser({
+              username: profile.emails?.[0]?.value || `linkedin_${profile.id}`,
+              password: await hashPassword(randomBytes(32).toString("hex")),
+              linkedinId: profile.id,
+              email: profile.emails?.[0]?.value,
+            });
+          }
+
+          return done(null, user);
+        } catch (error) {
+          return done(error);
+        }
+      }
+    )
+  );
+
   passport.serializeUser((user, done) => done(null, user.id));
   passport.deserializeUser(async (id: number, done) => {
     try {
@@ -179,6 +211,20 @@ export function setupAuth(app: Express) {
   app.get(
     "/api/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "/auth" }),
+    (req, res) => {
+      res.redirect("/dashboard");
+    }
+  );
+
+  // LinkedIn auth routes
+  app.get(
+    "/api/auth/linkedin",
+    passport.authenticate("linkedin")
+  );
+
+  app.get(
+    "/api/auth/linkedin/callback",
+    passport.authenticate("linkedin", { failureRedirect: "/auth" }),
     (req, res) => {
       res.redirect("/dashboard");
     }

@@ -18,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SiGoogle } from "react-icons/si";
+import { SiGoogle, SiLinkedin } from "react-icons/si";
 
 export default function AuthPage() {
   const { loginMutation, registerMutation, user } = useAuth();
@@ -36,6 +36,10 @@ export default function AuthPage() {
 
   const handleGoogleLogin = () => {
     window.location.href = "/api/auth/google";
+  };
+
+  const handleLinkedInLogin = () => {
+    window.location.href = "/api/auth/linkedin";
   };
 
   if (user) {
@@ -172,6 +176,15 @@ export default function AuthPage() {
                     >
                       <SiGoogle className="mr-2 h-4 w-4" />
                       Continue with Google
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleLinkedInLogin}
+                      className="w-full"
+                    >
+                      <SiLinkedin className="mr-2 h-4 w-4" />
+                      Continue with LinkedIn
                     </Button>
                   </div>
                 </form>
