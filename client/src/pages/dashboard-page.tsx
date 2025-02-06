@@ -11,30 +11,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import type { CVReview, Product, Consultation } from "@shared/schema";
-import { Upload, Calendar, ArrowRight } from "lucide-react";
+import type { CVReview } from "@shared/schema";
+import { Upload, FileText, Check, Clock, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
-import { formatPrice } from "@/lib/currency";
+import { Badge } from "@/components/ui/badge";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
 
-  const { data: reviews } = useQuery<CVReview[]>({
+  const { data: reviews, isLoading: isLoadingReviews } = useQuery<CVReview[]>({
     queryKey: ["/api/cv-reviews"],
-  });
-
-  const { data: consultations } = useQuery<Consultation[]>({
-    queryKey: ["/api/consultations"],
-  });
-
-  const { data: products } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
   });
 
   const uploadMutation = useMutation({
@@ -55,176 +45,169 @@ export default function DashboardPage() {
     },
   });
 
-  const consultationMutation = useMutation({
-    mutationFn: async (data: { date: string; time: string }) => {
-      const res = await apiRequest("POST", "/api/consultations", data);
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/consultations"] });
-    },
-  });
-
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Welcome, {user?.username}</h1>
-          <Button variant="outline" asChild>
-            <Link href="/">Back to Home</Link>
-          </Button>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/">
+              <span className="font-serif text-xl font-bold text-primary cursor-pointer">
+                RESUMATE
+              </span>
+            </Link>
+            <Button variant="outline" asChild>
+              <Link href="/">Back to Home</Link>
+            </Button>
+          </div>
         </div>
+      </nav>
 
-        <Tabs defaultValue="reviews">
-          <TabsList className="mb-8">
-            <TabsTrigger value="reviews">CV Reviews</TabsTrigger>
-            <TabsTrigger value="consultations">Consultations</TabsTrigger>
-            <TabsTrigger value="products">Digital Products</TabsTrigger>
-          </TabsList>
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">
+              Welcome back, {user?.firstName || user?.username}
+            </h1>
+            <p className="text-muted-foreground">
+              Track your CV reviews and upload new documents for professional feedback.
+            </p>
+          </header>
 
-          <TabsContent value="reviews">
-            <div className="grid gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Submit New CV</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      if (file) uploadMutation.mutateAsync(file);
-                    }}
-                    className="flex gap-4"
-                  >
-                    <Input
+          {/* Upload Section */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Submit New CV for Review
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (file) uploadMutation.mutateAsync(file);
+                }}
+                className="space-y-4"
+              >
+                <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center space-y-4">
+                  <div className="flex justify-center">
+                    <input
                       type="file"
+                      id="cv-upload"
+                      className="hidden"
                       onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                       accept=".pdf,.doc,.docx"
                     />
-                    <Button
-                      type="submit"
-                      disabled={!file || uploadMutation.isPending}
+                    <label
+                      htmlFor="cv-upload"
+                      className="cursor-pointer flex flex-col items-center space-y-2"
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+                      {file ? (
+                        <>
+                          <Check className="h-12 w-12 text-green-500" />
+                          <span className="text-sm text-muted-foreground">
+                            {file.name}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <FileText className="h-12 w-12 text-gray-400" />
+                          <span className="text-sm text-muted-foreground">
+                            Click to upload your CV (PDF, DOC, DOCX)
+                          </span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Reviews</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Feedback</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {reviews?.map((review) => (
-                        <TableRow key={review.id}>
-                          <TableCell>
-                            {format(new Date(review.createdAt), "PP")}
-                          </TableCell>
-                          <TableCell>{review.status}</TableCell>
-                          <TableCell>{review.feedback || "Pending"}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="consultations">
-            <div className="grid gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Book Consultation</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const formData = new FormData(e.currentTarget);
-                      consultationMutation.mutateAsync({
-                        date: formData.get("date") as string,
-                        time: formData.get("time") as string,
-                      });
-                    }}
-                    className="flex gap-4"
+                <div className="flex justify-end">
+                  <Button
+                    type="submit"
+                    disabled={!file || uploadMutation.isPending}
+                    className="w-full sm:w-auto"
                   >
-                    <Input type="date" name="date" required />
-                    <Input type="time" name="time" required />
-                    <Button type="submit" disabled={consultationMutation.isPending}>
-                      <Calendar className="w-4 h-4 mr-2" />
-                      Book
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Bookings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Time</TableHead>
-                        <TableHead>Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {consultations?.map((consultation) => (
-                        <TableRow key={consultation.id}>
-                          <TableCell>{consultation.date}</TableCell>
-                          <TableCell>{consultation.time}</TableCell>
-                          <TableCell>{consultation.status}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="products">
-            <div className="grid md:grid-cols-3 gap-8">
-              {products?.map((product) => (
-                <Card key={product.id}>
-                  <CardHeader>
-                    <CardTitle>{product.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4">
-                      {product.description}
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold">
-                        {formatPrice(product.price)}
-                      </span>
-                      <Button>
-                        Buy Now
+                    {uploadMutation.isPending ? (
+                      "Uploading..."
+                    ) : (
+                      <>
+                        Submit for Review
                         <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Reviews Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Your CV Reviews
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingReviews ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Loading your reviews...
+                </div>
+              ) : reviews?.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  You haven't submitted any CVs for review yet.
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Submitted On</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Feedback</TableHead>
+                      <TableHead>Document</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reviews?.map((review) => (
+                      <TableRow key={review.id}>
+                        <TableCell>
+                          {format(new Date(review.createdAt), "PPP")}
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={review.status === "completed" ? "default" : "secondary"}
+                            className={review.status === "completed" ? "bg-green-100 text-green-800" : ""}
+                          >
+                            {review.status === "completed" ? (
+                              <Check className="w-3 h-3 mr-1" />
+                            ) : (
+                              <Clock className="w-3 h-3 mr-1" />
+                            )}
+                            {review.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {review.feedback || (
+                            <span className="text-muted-foreground">Pending review</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button variant="link" asChild size="sm">
+                            <a href={review.fileUrl} target="_blank" rel="noopener noreferrer">
+                              View CV
+                            </a>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   );
 }
