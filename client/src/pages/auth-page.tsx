@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema, type InsertUser } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Loader2, AlertCircle, ArrowLeft } from "lucide-react";
+import { FileText, Loader2, AlertCircle, ArrowLeft, Heart } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Navigation } from "@/components/navigation";
 
@@ -27,10 +27,16 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<InsertUser>({
-    resolver: zodResolver(insertUserSchema),
+    resolver: zodResolver(
+      activeTab === "login"
+        ? insertUserSchema.pick({ username: true, password: true })
+        : insertUserSchema
+    ),
     defaultValues: {
       username: "",
+      email: "",
       password: "",
+      firstName: "",
     },
   });
 
@@ -80,12 +86,12 @@ export default function AuthPage() {
           <Card className="lg:col-span-3 border-primary/10 hover:border-primary/20 transition-colors duration-300">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-bold tracking-tight">
-                {activeTab === "login" ? "Welcome back" : "Create an account"}
+                {activeTab === "login" ? "Welcome back" : "Let's get started"}
               </CardTitle>
               <CardDescription>
                 {activeTab === "login"
-                  ? "Enter your credentials to access your account"
-                  : "Fill in your details to create a new account"}
+                  ? "Sign in to manage your CV reviews"
+                  : "Create your account to get expert CV feedback"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -106,11 +112,11 @@ export default function AuthPage() {
                 {activeTab === "register" && (
                   <div className="mb-6 text-sm bg-primary/5 border border-primary/10 p-4 rounded-lg">
                     <p className="flex items-start gap-2">
-                      <span className="mt-0.5">🔒</span>
+                      <Heart className="w-4 h-4 mt-0.5 text-primary" />
                       <span>
-                        Don't worry! We only need these details to create your secure portal for CV reviews. 
+                        Join our community of professionals improving their career prospects.
                         <span className="block mt-1 text-muted-foreground">
-                          No spam emails, no newsletters - just a safe space for your career growth journey! <span className="ml-1">✨</span>
+                          Get personalized CV feedback from industry experts!
                         </span>
                       </span>
                     </p>
@@ -118,7 +124,49 @@ export default function AuthPage() {
                 )}
 
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    {activeTab === "register" && (
+                      <>
+                        <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <Label>What should we call you?</Label>
+                              <FormControl>
+                                <Input 
+                                  placeholder="Your first name"
+                                  {...field}
+                                  disabled={registerMutation.isPending}
+                                  className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <Label>Email address</Label>
+                              <FormControl>
+                                <Input 
+                                  type="email"
+                                  placeholder="you@example.com"
+                                  {...field}
+                                  disabled={registerMutation.isPending}
+                                  className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
+
                     <FormField
                       control={form.control}
                       name="username"
@@ -127,7 +175,7 @@ export default function AuthPage() {
                           <Label>Username</Label>
                           <FormControl>
                             <Input 
-                              placeholder="Enter your username"
+                              placeholder="Choose a username"
                               {...field}
                               disabled={loginMutation.isPending || registerMutation.isPending}
                               className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
@@ -147,7 +195,7 @@ export default function AuthPage() {
                           <FormControl>
                             <Input 
                               type="password"
-                              placeholder="Enter your password"
+                              placeholder={activeTab === "register" ? "Create a secure password" : "Enter your password"}
                               {...field}
                               disabled={loginMutation.isPending || registerMutation.isPending}
                               className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
@@ -166,10 +214,10 @@ export default function AuthPage() {
                       {(loginMutation.isPending || registerMutation.isPending) ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {activeTab === "login" ? "Logging in..." : "Creating account..."}
+                          {activeTab === "login" ? "Signing in..." : "Creating your account..."}
                         </>
                       ) : (
-                        activeTab === "login" ? "Login" : "Create Account"
+                        activeTab === "login" ? "Sign In" : "Create Account"
                       )}
                     </Button>
                   </form>
@@ -184,17 +232,18 @@ export default function AuthPage() {
               <div className="mb-6">
                 <FileText className="w-12 h-12 mb-4 animate-fade-in" />
                 <h1 className="text-xl font-bold mb-2">
-                  Professional CV Review Service
+                  Expert CV Review Service
                 </h1>
                 <p className="text-primary-foreground/90 text-sm leading-relaxed">
-                  Get expert feedback on your CV, access professional templates, and book
-                  consultations with industry experts to advance your career.
+                  Get personalized feedback on your CV from industry experts. Our professional 
+                  reviewers will help you stand out to employers and increase your chances of 
+                  landing your dream job.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <div>
-                  <div className="text-lg font-bold mb-1">24/7</div>
-                  <div className="text-sm text-primary-foreground/80">Expert Support</div>
+                  <div className="text-lg font-bold mb-1">48h</div>
+                  <div className="text-sm text-primary-foreground/80">Fast Turnaround</div>
                 </div>
                 <div>
                   <div className="text-lg font-bold mb-1">1000+</div>

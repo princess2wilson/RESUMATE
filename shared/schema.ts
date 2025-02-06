@@ -5,12 +5,10 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
+  email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  firstName: text("first_name"),  // Make it nullable initially
+  firstName: text("first_name").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
-  googleId: text("google_id"),
-  linkedinId: text("linkedin_id"),
-  email: text("email"),
 });
 
 export const cvReviews = pgTable("cv_reviews", {
@@ -23,14 +21,18 @@ export const cvReviews = pgTable("cv_reviews", {
   isPromotional: boolean("is_promotional").notNull().default(false),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-  firstName: true,
-  googleId: true,
-  linkedinId: true,
-  email: true,
-});
+export const insertUserSchema = createInsertSchema(users)
+  .pick({
+    username: true,
+    email: true,
+    password: true,
+    firstName: true,
+  })
+  .extend({
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    firstName: z.string().min(1, "Please let us know what to call you"),
+  });
 
 export const insertCVReviewSchema = createInsertSchema(cvReviews).pick({
   fileUrl: true,
