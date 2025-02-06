@@ -104,9 +104,16 @@ export default function AuthPage() {
                 )}
 
                 {activeTab === "register" && (
-                  <div className="mb-6 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-                    <p>🔒 Don't worry! We only need these details to create your secure portal for CV reviews. 
-                    No spam emails, no newsletters - just a safe space for your career growth journey! ✨</p>
+                  <div className="mb-6 text-sm bg-primary/5 border border-primary/10 p-4 rounded-lg">
+                    <p className="flex items-start gap-2">
+                      <span className="mt-0.5">🔒</span>
+                      <span>
+                        Don't worry! We only need these details to create your secure portal for CV reviews. 
+                        <span className="block mt-1 text-muted-foreground">
+                          No spam emails, no newsletters - just a safe space for your career growth journey! <span className="ml-1">✨</span>
+                        </span>
+                      </span>
+                    </p>
                   </div>
                 )}
 
