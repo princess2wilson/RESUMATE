@@ -161,10 +161,6 @@ export default function ResourceLibraryPage() {
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <h1 className="text-4xl font-serif font-bold">Digital Resource Library</h1>
-            <Badge variant="secondary" className="bg-primary/10 text-primary">
-              <Sparkles className="w-4 h-4 mr-1" />
-              50% OFF
-            </Badge>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Access premium templates, guides, and tools to accelerate your career growth
@@ -254,6 +250,9 @@ export default function ResourceLibraryPage() {
                 <div className="text-center">
                   <div className="inline-flex items-center gap-2">
                     <div className="text-3xl font-bold">${(selectedProduct?.price || 0) / 100}</div>
+                    <div className="text-xl text-muted-foreground line-through">
+                      ${((selectedProduct?.price || 0) * 2) / 100}
+                    </div>
                     <Badge variant="secondary" className="bg-primary/10 text-primary">
                       <Sparkles className="w-4 h-4 mr-1" />
                       50% OFF
