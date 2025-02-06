@@ -38,8 +38,10 @@ export function setupAuth(app: Express) {
     store: storage.sessionStore,
     cookie: {
       secure: true,
-      sameSite: 'none'
-    }
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    },
+    name: 'resumate.sid'
   };
 
   if (app.get("env") === "production") {
@@ -109,7 +111,9 @@ export function setupAuth(app: Express) {
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
         callbackURL: 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev/api/auth/linkedin/callback',
         scope: ["r_emailaddress", "r_liteprofile"],
-        passReqToCallback: true
+        passReqToCallback: true,
+        state: true,
+        proxy: true
       },
       async (req: any, accessToken: string, refreshToken: string, profile: any, done: any) => {
         try {
@@ -121,21 +125,14 @@ export function setupAuth(app: Express) {
             hasRefreshToken: !!refreshToken
           });
 
-          console.log("Request details:", {
-            headers: req.headers,
-            url: req.url,
-            session: req.session ? "Present" : "Missing",
-            cookies: req.cookies
-          });
-
           let user = await storage.getUserByLinkedinId(profile.id);
           console.log("LinkedIn user lookup result:", user ? "Found existing user" : "No existing user found");
 
           if (!user) {
             console.log("Creating new user from LinkedIn profile");
             const username = profile.emails?.[0]?.value || 
-                          profile.displayName?.replace(/\s+/g, '_').toLowerCase() || 
-                          `linkedin_${profile.id}`;
+                              profile.displayName?.replace(/\s+/g, '_').toLowerCase() || 
+                              `linkedin_${profile.id}`;
 
             try {
               user = await storage.createUser({
@@ -166,7 +163,7 @@ export function setupAuth(app: Express) {
     (req, res, next) => {
       console.log("Starting LinkedIn authentication", {
         headers: req.headers,
-        session: req.session
+        session: req.session ? "Present" : "Missing"
       });
 
       passport.authenticate("linkedin")(req, res, next);
@@ -179,19 +176,27 @@ export function setupAuth(app: Express) {
       console.log("LinkedIn callback received", {
         query: req.query,
         headers: req.headers,
-        session: req.session,
+        session: req.session ? "Present" : "Missing",
         cookies: req.cookies
       });
+
+      if (req.query.error) {
+        console.error("LinkedIn OAuth Error:", {
+          error: req.query.error,
+          description: req.query.error_description
+        });
+        return res.redirect('/auth?error=' + encodeURIComponent(req.query.error_description as string));
+      }
 
       passport.authenticate("linkedin", (err: any, user: any, info: any) => {
         if (err) {
           console.error("LinkedIn callback authentication error:", err);
-          return res.redirect('/auth?error=linkedin_auth_failed');
+          return res.redirect('/auth?error=' + encodeURIComponent(err.message));
         }
 
         if (!user) {
           console.error("LinkedIn auth: No user returned", { info });
-          return res.redirect('/auth?error=linkedin_auth_failed');
+          return res.redirect('/auth?error=authentication_failed');
         }
 
         req.login(user, (loginErr) => {
