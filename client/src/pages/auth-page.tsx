@@ -18,7 +18,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { SiGoogle, SiLinkedin } from "react-icons/si";
 
 export default function AuthPage() {
   const { loginMutation, registerMutation, user } = useAuth();
@@ -33,14 +32,6 @@ export default function AuthPage() {
       password: "",
     },
   });
-
-  const handleGoogleLogin = () => {
-    window.location.href = "/api/auth/google";
-  };
-
-  const handleLinkedInLogin = () => {
-    window.location.href = "/api/auth/linkedin";
-  };
 
   if (user) {
     setLocation("/dashboard");
@@ -57,7 +48,6 @@ export default function AuthPage() {
       }
     } catch (err) {
       if (err instanceof Error) {
-        // Convert backend error messages to user-friendly messages
         if (err.message.includes("Invalid username or password")) {
           setError("The username or password you entered is incorrect. Please try again.");
         } else if (err.message.includes("Username already exists")) {
@@ -155,38 +145,6 @@ export default function AuthPage() {
                       activeTab === "login" ? "Login" : "Create Account"
                     )}
                   </Button>
-
-                  <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t"></div>
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-background px-2 text-muted-foreground">
-                        Or continue with
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleGoogleLogin}
-                      className="w-full"
-                    >
-                      <SiGoogle className="mr-2 h-4 w-4" />
-                      Continue with Google
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleLinkedInLogin}
-                      className="w-full"
-                    >
-                      <SiLinkedin className="mr-2 h-4 w-4" />
-                      Continue with LinkedIn
-                    </Button>
-                  </div>
                 </form>
               </Form>
             </Tabs>

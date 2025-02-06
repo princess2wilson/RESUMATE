@@ -1,7 +1,5 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as LinkedInStrategy } from "passport-linkedin-oauth2";
 import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
@@ -52,7 +50,6 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Local Strategy
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
@@ -73,203 +70,7 @@ export function setupAuth(app: Express) {
     })
   );
 
-  // Google Strategy
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        callbackURL: 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev/api/auth/google/callback',
-      },
-      async (accessToken, refreshToken, profile, done) => {
-        try {
-          console.log("Google OAuth Profile Data:", {
-            id: profile.id,
-            email: profile.emails?.[0]?.value,
-            displayName: profile.displayName,
-            accessToken: accessToken ? "Present" : "Missing",
-            hasRefreshToken: !!refreshToken
-          });
-
-          let user = await storage.getUserByGoogleId(profile.id);
-          console.log("Google user lookup result:", user ? "Found existing user" : "No existing user found");
-
-          if (!user) {
-            console.log("Creating new user from Google profile");
-            try {
-              user = await storage.createUser({
-                username: profile.emails?.[0]?.value || `google_${profile.id}`,
-                password: await hashPassword(randomBytes(32).toString("hex")),
-                googleId: profile.id,
-                email: profile.emails?.[0]?.value,
-              });
-              console.log("Successfully created new user:", { userId: user.id, username: user.username });
-            } catch (createError) {
-              console.error("Failed to create new user:", createError);
-              return done(createError);
-            }
-          }
-
-          return done(null, user);
-        } catch (error) {
-          console.error("Google authentication error:", error);
-          return done(error);
-        }
-      }
-    )
-  );
-
-  // LinkedIn Strategy
-  passport.use(
-    new LinkedInStrategy(
-      {
-        clientID: process.env.LINKEDIN_CLIENT_ID!,
-        clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        callbackURL: 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev/api/auth/linkedin/callback',
-        scope: ["r_emailaddress", "r_liteprofile"],
-        passReqToCallback: true,
-        state: true,
-        proxy: true
-      },
-      async (req: any, accessToken: string, refreshToken: string, profile: any, done: any) => {
-        try {
-          console.log("LinkedIn OAuth Profile Data:", {
-            id: profile.id,
-            email: profile.emails?.[0]?.value,
-            displayName: profile.displayName,
-            accessToken: accessToken ? "Present" : "Missing",
-            hasRefreshToken: !!refreshToken
-          });
-
-          let user = await storage.getUserByLinkedinId(profile.id);
-          console.log("LinkedIn user lookup result:", user ? "Found existing user" : "No existing user found");
-
-          if (!user) {
-            console.log("Creating new user from LinkedIn profile");
-            const username = profile.emails?.[0]?.value || 
-                              profile.displayName?.replace(/\s+/g, '_').toLowerCase() || 
-                              `linkedin_${profile.id}`;
-
-            try {
-              user = await storage.createUser({
-                username,
-                password: await hashPassword(randomBytes(32).toString("hex")),
-                linkedinId: profile.id,
-                email: profile.emails?.[0]?.value,
-              });
-              console.log("Successfully created new user:", { userId: user.id, username });
-            } catch (createError) {
-              console.error("Failed to create new user:", createError);
-              return done(createError);
-            }
-          }
-
-          return done(null, user);
-        } catch (error) {
-          console.error("LinkedIn authentication error:", error);
-          return done(error);
-        }
-      }
-    )
-  );
-
-  // LinkedIn auth routes with enhanced logging
-  app.get(
-    "/api/auth/linkedin",
-    (req, res, next) => {
-      console.log("Starting LinkedIn authentication", {
-        headers: req.headers,
-        session: req.session ? "Present" : "Missing"
-      });
-
-      passport.authenticate("linkedin")(req, res, next);
-    }
-  );
-
-  app.get(
-    "/api/auth/linkedin/callback",
-    (req, res, next) => {
-      console.log("LinkedIn callback received", {
-        query: req.query,
-        headers: req.headers,
-        session: req.session ? "Present" : "Missing",
-        cookies: req.cookies
-      });
-
-      if (req.query.error) {
-        console.error("LinkedIn OAuth Error:", {
-          error: req.query.error,
-          description: req.query.error_description
-        });
-        return res.redirect('/auth?error=' + encodeURIComponent(req.query.error_description as string));
-      }
-
-      passport.authenticate("linkedin", (err: any, user: any, info: any) => {
-        if (err) {
-          console.error("LinkedIn callback authentication error:", err);
-          return res.redirect('/auth?error=' + encodeURIComponent(err.message));
-        }
-
-        if (!user) {
-          console.error("LinkedIn auth: No user returned", { info });
-          return res.redirect('/auth?error=authentication_failed');
-        }
-
-        req.login(user, (loginErr) => {
-          if (loginErr) {
-            console.error("Login error after LinkedIn auth:", loginErr);
-            return res.redirect('/auth?error=login_failed');
-          }
-
-          console.log("LinkedIn authentication successful, redirecting to dashboard");
-          return res.redirect('/dashboard');
-        });
-      })(req, res, next);
-    }
-  );
-
-  // Google auth routes with better error handling
-  app.get(
-    "/api/auth/google",
-    (req, res, next) => {
-      console.log("Starting Google authentication", {
-        headers: req.headers,
-        session: req.session ? "Present" : "Missing"
-      });
-      passport.authenticate("google", { 
-        scope: ["profile", "email"],
-        prompt: "select_account"
-      })(req, res, next);
-    }
-  );
-
-  app.get(
-    "/api/auth/google/callback",
-    (req, res, next) => {
-      console.log("Google callback received", {
-        query: req.query,
-        headers: req.headers,
-        session: req.session ? "Present" : "Missing"
-      });
-
-      if (req.query.error) {
-        console.error("Google OAuth Error:", {
-          error: req.query.error,
-          description: req.query.error_description
-        });
-        return res.redirect('/auth?error=' + encodeURIComponent(req.query.error_description as string));
-      }
-
-      passport.authenticate("google", { failureRedirect: '/auth?error=google_auth_failed' })(req, res, next);
-    },
-    (req, res) => {
-      res.redirect("/dashboard");
-    }
-  );
-
-  // Session serialization
   passport.serializeUser((user, done) => {
-    console.log("Serializing user:", user.id);
     done(null, user.id);
   });
 
@@ -277,18 +78,14 @@ export function setupAuth(app: Express) {
     try {
       const user = await storage.getUser(id);
       if (!user) {
-        console.error("User not found during deserialization:", id);
         return done(new Error('User not found'), null);
       }
-      console.log("Deserialized user:", id);
       done(null, user);
     } catch (error) {
-      console.error("Error during deserialization:", error);
       done(error, null);
     }
   });
 
-  // Local auth routes
   app.post("/api/register", async (req, res) => {
     try {
       if (!req.body.username || !req.body.password) {
