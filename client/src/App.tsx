@@ -4,6 +4,7 @@ import {
   useQuery,
   useMutation,
   UseMutationResult,
+  QueryClientProvider,
 } from "@tanstack/react-query";
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
@@ -131,9 +132,11 @@ export const useAuth = (): AuthContextType => {
 
 const App = () => {
   return (
-    <AuthProvider>
-      {/* Your app content */}
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        {/* Your app content */}
+      </AuthProvider>
+    </QueryClientProvider>
   );
 };
 
