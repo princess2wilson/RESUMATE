@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, Check } from "lucide-react";
+import { Upload, FileText, Check, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/use-auth";
 import { useMutation } from "@tanstack/react-query";
@@ -14,6 +14,12 @@ export default function CVSubmissionPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Redirect to auth if not logged in
+  if (!user) {
+    setLocation('/auth?redirect=/cv-submission');
+    return null;
+  }
 
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -71,26 +77,11 @@ export default function CVSubmissionPage() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-2xl mx-auto"
         >
-          {/* Promotional Banner */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-primary/10 rounded-lg p-6 mb-8 text-center"
-          >
-            <h2 className="text-2xl font-bold text-primary mb-2">🎉 Limited Time Offer!</h2>
-            <p className="text-lg mb-2">
-              Get your CV reviewed with <span className="font-bold">70% OFF</span>
-            </p>
-            <div className="text-sm text-muted-foreground">
-              Only available for the first 10 submissions - Act fast!
-            </div>
-          </motion.div>
-
           <Card>
             <CardHeader>
-              <CardTitle>Submit Your CV for Review</CardTitle>
+              <CardTitle>Submit Your CV for Expert Review</CardTitle>
               <CardDescription>
-                Our expert team will review your CV and provide detailed feedback to help improve your career prospects.
+                Get professional feedback to enhance your career prospects
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -131,14 +122,29 @@ export default function CVSubmissionPage() {
                   <div className="bg-muted/50 rounded-lg p-4">
                     <h4 className="font-medium mb-2 flex items-center gap-2">
                       <FileText className="w-4 h-4" />
-                      What happens next?
+                      How it works
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-2">
-                      <li>• Our expert team will review your CV within 48 hours</li>
-                      <li>• You'll receive a notification when the review is ready</li>
-                      <li>• Complete the payment to access your detailed feedback</li>
-                      <li>• If you're one of the first 10 submissions, you'll get 70% OFF!</li>
-                      <li>• Get comprehensive suggestions to enhance your CV</li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                        Upload your CV now - no payment required
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                        Our expert team will review within 48 hours
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                        You'll be notified when the review is ready
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Lock className="w-3 h-3 text-primary/70" />
+                        Complete payment to access your detailed feedback
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                        First 10 submissions get 70% OFF!
+                      </li>
                     </ul>
                   </div>
 

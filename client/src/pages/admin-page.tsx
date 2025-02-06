@@ -17,6 +17,8 @@ import type { CVReview } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, Clock, Lock } from "lucide-react";
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -89,8 +91,9 @@ export default function AdminPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
-                  <TableHead>User</TableHead>
+                  <TableHead>User ID</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Promotional</TableHead>
                   <TableHead>File</TableHead>
                   <TableHead>Action</TableHead>
                 </TableRow>
@@ -102,7 +105,23 @@ export default function AdminPage() {
                       {format(new Date(review.createdAt), "PP")}
                     </TableCell>
                     <TableCell>{review.userId}</TableCell>
-                    <TableCell>{review.status}</TableCell>
+                    <TableCell>
+                      <Badge variant={review.status === "completed" ? "success" : "secondary"}>
+                        {review.status === "completed" ? (
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                        ) : (
+                          <Clock className="w-3 h-3 mr-1" />
+                        )}
+                        {review.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {review.isPromotional ? (
+                        <Badge variant="default">70% OFF</Badge>
+                      ) : (
+                        <Badge variant="outline">Regular</Badge>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Button variant="link" asChild>
                         <a href={review.fileUrl} target="_blank" rel="noopener">
@@ -111,13 +130,18 @@ export default function AdminPage() {
                       </Button>
                     </TableCell>
                     <TableCell>
-                      {review.status === "pending" && (
+                      {review.status === "pending" ? (
                         <Button
                           onClick={() => setSelectedReviewId(review.id)}
                           variant="outline"
                         >
                           Add Feedback
                         </Button>
+                      ) : (
+                        <Badge variant="secondary">
+                          <Lock className="w-3 h-3 mr-1" />
+                          Locked
+                        </Badge>
                       )}
                     </TableCell>
                   </TableRow>
