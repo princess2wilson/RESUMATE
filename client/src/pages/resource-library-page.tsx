@@ -183,38 +183,57 @@ export default function ResourceLibraryPage() {
                 key={product.id}
                 variants={itemVariants}
                 whileHover={{
-                  y: -10,
-                  transition: { type: "spring", stiffness: 300 }
+                  y: -5,
+                  transition: { duration: 0.3 }
                 }}
                 className="h-full"
               >
-                <Card className="h-full flex flex-col group hover:shadow-xl transition-all duration-300 hover:border-primary/20">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+                  <div className="absolute top-4 right-4">
+                    <Badge variant="secondary" className="bg-primary/10 text-primary">
+                      <Sparkles className="w-4 h-4 mr-1" />
+                      50% OFF
+                    </Badge>
+                  </div>
+                  <CardHeader className="flex-none pb-6">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
-                    <CardTitle>{product.name}</CardTitle>
+                    <CardTitle className="font-serif">{product.name}</CardTitle>
                     <CardDescription>{product.description}</CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-1 flex flex-col">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
+                  <CardContent className="pt-0 flex-1 flex flex-col">
+                    <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                        Industry-specific templates
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                        Step-by-step guides
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                        Lifetime updates
+                      </li>
+                    </ul>
+                    <div className="mt-auto">
+                      <div className="mb-4">
                         <span className="text-2xl font-bold">${discountedPrice / 100}</span>
-                        <span className="text-sm text-muted-foreground line-through">
+                        <span className="text-sm text-muted-foreground line-through ml-2">
                           ${originalPrice / 100}
                         </span>
-                        <Badge variant="secondary" className="bg-primary/10 text-primary">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          50% OFF
-                        </Badge>
                       </div>
+                      <Button
+                        className="w-full group"
+                        onClick={() => setSelectedProduct({ ...product, price: discountedPrice })}
+                      >
+                        <span className="group-hover:translate-x-1 transition-transform duration-300">
+                          VIEW DETAILS
+                        </span>
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                      </Button>
                     </div>
-                    <Button className="w-full group" onClick={() => setSelectedProduct({...product, price: discountedPrice})}>
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">
-                        VIEW DETAILS
-                      </span>
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -257,26 +276,24 @@ export default function ResourceLibraryPage() {
               </div>
 
               <div className="space-y-4">
-                <div className="text-center">
-                  <div className="inline-flex items-center gap-2">
-                    <div className="text-3xl font-bold">${(selectedProduct?.price || 0) / 100}</div>
-                    <div className="text-xl text-muted-foreground line-through">
-                      ${((selectedProduct?.price || 0) * 2) / 100}
-                    </div>
-                    <Badge variant="secondary" className="bg-primary/10 text-primary">
-                      <Sparkles className="w-4 h-4 mr-1" />
-                      50% OFF
-                    </Badge>
+                <div className="flex items-center justify-center gap-4">
+                  <div className="text-3xl font-bold">${(selectedProduct?.price || 0) / 100}</div>
+                  <div className="text-xl text-muted-foreground line-through">
+                    ${((selectedProduct?.price || 0) * 2) / 100}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">
-                    Limited time offer
-                  </div>
-                  <div className="flex justify-center gap-2 mt-2">
-                    <SiVisa className="w-8 h-8 text-gray-400" />
-                    <SiMastercard className="w-8 h-8 text-gray-400" />
-                    <SiAmericanexpress className="w-8 h-8 text-gray-400" />
-                    <SiPaypal className="w-8 h-8 text-gray-400" />
-                  </div>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    <Sparkles className="w-4 h-4 mr-1" />
+                    50% OFF
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground text-center">
+                  Limited time offer
+                </div>
+                <div className="flex justify-center gap-2">
+                  <SiVisa className="w-8 h-8 text-gray-400" />
+                  <SiMastercard className="w-8 h-8 text-gray-400" />
+                  <SiAmericanexpress className="w-8 h-8 text-gray-400" />
+                  <SiPaypal className="w-8 h-8 text-gray-400" />
                 </div>
                 <Button
                   className="w-full bg-primary hover:bg-primary/90 group"
