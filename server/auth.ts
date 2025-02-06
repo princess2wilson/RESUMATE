@@ -83,20 +83,36 @@ export function setupAuth(app: Express) {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
+          console.log("Google OAuth Profile Data:", {
+            id: profile.id,
+            email: profile.emails?.[0]?.value,
+            displayName: profile.displayName,
+            accessToken: accessToken ? "Present" : "Missing",
+            hasRefreshToken: !!refreshToken
+          });
+
           let user = await storage.getUserByGoogleId(profile.id);
+          console.log("Google user lookup result:", user ? "Found existing user" : "No existing user found");
 
           if (!user) {
-            // Create new user if doesn't exist
-            user = await storage.createUser({
-              username: profile.emails?.[0]?.value || `google_${profile.id}`,
-              password: await hashPassword(randomBytes(32).toString("hex")),
-              googleId: profile.id,
-              email: profile.emails?.[0]?.value,
-            });
+            console.log("Creating new user from Google profile");
+            try {
+              user = await storage.createUser({
+                username: profile.emails?.[0]?.value || `google_${profile.id}`,
+                password: await hashPassword(randomBytes(32).toString("hex")),
+                googleId: profile.id,
+                email: profile.emails?.[0]?.value,
+              });
+              console.log("Successfully created new user:", { userId: user.id, username: user.username });
+            } catch (createError) {
+              console.error("Failed to create new user:", createError);
+              return done(createError);
+            }
           }
 
           return done(null, user);
         } catch (error) {
+          console.error("Google authentication error:", error);
           return done(error);
         }
       }
@@ -212,15 +228,40 @@ export function setupAuth(app: Express) {
     }
   );
 
-  // Google auth routes
+  // Google auth routes with better error handling
   app.get(
     "/api/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
+    (req, res, next) => {
+      console.log("Starting Google authentication", {
+        headers: req.headers,
+        session: req.session ? "Present" : "Missing"
+      });
+      passport.authenticate("google", { 
+        scope: ["profile", "email"],
+        prompt: "select_account"
+      })(req, res, next);
+    }
   );
 
   app.get(
     "/api/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/auth?error=google_auth_failed" }),
+    (req, res, next) => {
+      console.log("Google callback received", {
+        query: req.query,
+        headers: req.headers,
+        session: req.session ? "Present" : "Missing"
+      });
+
+      if (req.query.error) {
+        console.error("Google OAuth Error:", {
+          error: req.query.error,
+          description: req.query.error_description
+        });
+        return res.redirect('/auth?error=' + encodeURIComponent(req.query.error_description as string));
+      }
+
+      passport.authenticate("google", { failureRedirect: '/auth?error=google_auth_failed' })(req, res, next);
+    },
     (req, res) => {
       res.redirect("/dashboard");
     }

@@ -21,21 +21,30 @@ export function registerRoutes(app: Express): Server {
 
   // Add this new route to help with OAuth configuration
   app.get("/api/auth/config", (req, res) => {
-    const replSlug = process.env.REPL_SLUG || '';
-    const replOwner = process.env.REPL_OWNER || '';
-    const baseUrl = `https://${replSlug}.${replOwner}.repl.co`;
+    const domain = 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev';
 
     res.json({
-      replDetails: {
-        replSlug,
-        replOwner,
-        fullDomain: `${replSlug}.${replOwner}.repl.co`
+      google: {
+        redirectUrl: `${domain}/api/auth/google/callback`,
+        instructions: [
+          "1. Go to Google Cloud Console (https://console.cloud.google.com)",
+          "2. Select your project",
+          "3. Go to APIs & Services > OAuth Consent Screen",
+          "4. Add your app name and authorized domain",
+          "5. Go to Credentials > OAuth 2.0 Client IDs",
+          "6. Add the redirect URI listed above",
+          "7. Make sure to add the domain to authorized domains"
+        ]
       },
-      redirectUrls: {
-        google: `${baseUrl}/api/auth/google/callback`,
-        linkedin: `${baseUrl}/api/auth/linkedin/callback`
-      },
-      instructions: "Add these URLs to your OAuth provider's authorized redirect URLs"
+      linkedin: {
+        redirectUrl: `${domain}/api/auth/linkedin/callback`,
+        instructions: [
+          "1. Go to LinkedIn Developer Console",
+          "2. Select your app",
+          "3. Go to Auth > OAuth 2.0 settings",
+          "4. Add the redirect URI listed above"
+        ]
+      }
     });
   });
 
