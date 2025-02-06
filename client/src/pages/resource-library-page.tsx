@@ -186,6 +186,7 @@ export default function ResourceLibraryPage() {
                   y: -10,
                   transition: { type: "spring", stiffness: 300 }
                 }}
+                className="h-full"
               >
                 <Card className="h-full flex flex-col group hover:shadow-xl transition-all duration-300 hover:border-primary/20">
                   <CardHeader>
@@ -195,17 +196,26 @@ export default function ResourceLibraryPage() {
                     <CardTitle>{product.name}</CardTitle>
                     <CardDescription>{product.description}</CardDescription>
                   </CardHeader>
-                  <CardFooter className="mt-auto pt-6">
-                    <Button
-                      className="w-full group"
-                      onClick={() => setSelectedProduct({...product, price: discountedPrice})}
-                    >
+                  <CardContent className="flex-1 flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl font-bold">${discountedPrice / 100}</span>
+                        <span className="text-sm text-muted-foreground line-through">
+                          ${originalPrice / 100}
+                        </span>
+                        <Badge variant="secondary" className="bg-primary/10 text-primary">
+                          <Sparkles className="w-3 h-3 mr-1" />
+                          50% OFF
+                        </Badge>
+                      </div>
+                    </div>
+                    <Button className="w-full group" onClick={() => setSelectedProduct({...product, price: discountedPrice})}>
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
                         VIEW DETAILS
                       </span>
                       <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                     </Button>
-                  </CardFooter>
+                  </CardContent>
                 </Card>
               </motion.div>
             );
