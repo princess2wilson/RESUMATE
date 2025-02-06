@@ -44,14 +44,20 @@ export function registerRoutes(app: Express): Server {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     if (!req.file) return res.status(400).send("No file uploaded");
 
-    const review = await storage.createCVReview({
-      userId: req.user.id,
-      fileUrl: req.file.path,
-      status: "pending",
-      feedback: null,
-      createdAt: new Date().toISOString(),
-    });
-    res.json(review);
+    try {
+      const review = await storage.createCVReview({
+        userId: req.user.id,
+        fileUrl: req.file.path,
+        status: "pending",
+        feedback: null,
+        createdAt: new Date().toISOString(),
+        isPromotional: false
+      });
+      res.json(review);
+    } catch (error) {
+      console.error('Error creating CV review:', error);
+      res.status(500).json({ error: 'Failed to create CV review' });
+    }
   });
 
   // Product routes (no auth required)

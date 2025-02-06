@@ -95,7 +95,10 @@ export class DatabaseStorage implements IStorage {
   async createCVReview(review: Omit<CVReview, "id">): Promise<CVReview> {
     const [newReview] = await db
       .insert(schema.cvReviews)
-      .values(review)
+      .values({
+        ...review,
+        isPromotional: false // Set default value
+      })
       .returning();
     return newReview;
   }

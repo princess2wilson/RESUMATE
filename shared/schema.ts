@@ -7,9 +7,9 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
-  googleId: text("google_id").unique(),
-  linkedinId: text("linkedin_id").unique(),
-  email: text("email").unique(),
+  googleId: text("google_id"),
+  linkedinId: text("linkedin_id"),
+  email: text("email"),
 });
 
 export const cvReviews = pgTable("cv_reviews", {
