@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -21,8 +20,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import Particles from "@tsparticles/react";
-import { loadSlim } from "@tsparticles/slim";
 import { Engine } from "@tsparticles/engine";
 import {
   SiMastercard,
@@ -77,6 +74,21 @@ const itemVariants = {
   },
 };
 
+// Add formatPrice utility function
+const formatPrice = (amount: number) => {
+  try {
+    return new Intl.NumberFormat(navigator.language || 'en-US', {
+      style: 'currency',
+      currency: 'USD', // Base currency is USD
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount / 100);
+  } catch (error) {
+    // Fallback formatting if Intl.NumberFormat fails
+    return `$${(amount / 100).toFixed(2)}`;
+  }
+};
+
 export default function ResourceLibraryPage() {
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -87,9 +99,6 @@ export default function ResourceLibraryPage() {
     queryKey: ["/api/products"],
   });
 
-  const initParticles = async (engine: Engine) => {
-    await loadSlim(engine);
-  };
 
   const handlePurchase = async (product: Product) => {
     try {
@@ -119,28 +128,6 @@ export default function ResourceLibraryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
-      <Particles
-        id="tsparticles"
-        init={initParticles}
-        options={{
-          particles: {
-            color: { value: "#6b7280" },
-            opacity: { value: 0.1 },
-            size: { value: 1 },
-            move: {
-              direction: "none",
-              enable: true,
-              speed: 0.5,
-            },
-            links: {
-              enable: true,
-              opacity: 0.05,
-            },
-          },
-          background: { color: { value: "transparent" } },
-        }}
-      />
-
       <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
@@ -219,9 +206,9 @@ export default function ResourceLibraryPage() {
                     </ul>
                     <div className="mt-auto">
                       <div className="mb-4">
-                        <span className="text-2xl font-bold">${discountedPrice / 100}</span>
+                        <span className="text-2xl font-bold">{formatPrice(discountedPrice)}</span>
                         <span className="text-sm text-muted-foreground line-through ml-2">
-                          ${originalPrice / 100}
+                          {formatPrice(originalPrice)}
                         </span>
                       </div>
                       <Button
@@ -276,18 +263,13 @@ export default function ResourceLibraryPage() {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-center gap-4">
-                  <div className="text-3xl font-bold">${(selectedProduct?.price || 0) / 100}</div>
-                  <div className="text-xl text-muted-foreground line-through">
-                    ${((selectedProduct?.price || 0) * 2) / 100}
+                <div className="text-center">
+                  <div className="text-3xl font-bold mb-1">
+                    {selectedProduct && formatPrice(selectedProduct.price)}
                   </div>
-                  <Badge variant="secondary" className="bg-primary/10 text-primary">
-                    <Sparkles className="w-4 h-4 mr-1" />
-                    50% OFF
-                  </Badge>
-                </div>
-                <div className="text-sm text-muted-foreground text-center">
-                  Limited time offer
+                  <div className="text-sm text-muted-foreground">
+                    Limited time offer
+                  </div>
                 </div>
                 <div className="flex justify-center gap-2">
                   <SiVisa className="w-8 h-8 text-gray-400" />
