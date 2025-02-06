@@ -70,16 +70,16 @@ export default function AuthPage() {
         <Button
           variant="ghost"
           onClick={() => setLocation("/")}
-          className="mb-8 -ml-2"
+          className="mb-8 -ml-2 hover:bg-background/60 transition-colors group"
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform duration-200" />
+          Back
         </Button>
 
         <div className="grid lg:grid-cols-5 gap-8 max-w-6xl mx-auto">
-          <Card className="lg:col-span-3">
+          <Card className="lg:col-span-3 border-primary/10 hover:border-primary/20 transition-colors duration-300">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold">
+              <CardTitle className="text-2xl font-bold tracking-tight">
                 {activeTab === "login" ? "Welcome back" : "Create an account"}
               </CardTitle>
               <CardDescription>
@@ -91,8 +91,8 @@ export default function AuthPage() {
             <CardContent>
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
                 <TabsList className="grid grid-cols-2 w-full mb-8">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="register">Register</TabsTrigger>
+                  <TabsTrigger value="login" className="text-sm">Login</TabsTrigger>
+                  <TabsTrigger value="register" className="text-sm">Register</TabsTrigger>
                 </TabsList>
 
                 {error && (
@@ -116,7 +116,7 @@ export default function AuthPage() {
                               placeholder="Enter your username"
                               {...field}
                               disabled={loginMutation.isPending || registerMutation.isPending}
-                              className="focus:ring-2 focus:ring-primary"
+                              className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
                             />
                           </FormControl>
                           <FormMessage />
@@ -136,7 +136,7 @@ export default function AuthPage() {
                               placeholder="Enter your password"
                               {...field}
                               disabled={loginMutation.isPending || registerMutation.isPending}
-                              className="focus:ring-2 focus:ring-primary"
+                              className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
                             />
                           </FormControl>
                           <FormMessage />
@@ -146,7 +146,7 @@ export default function AuthPage() {
 
                     <Button
                       type="submit"
-                      className="w-full"
+                      className="w-full transition-all duration-200 hover:translate-y-[-2px]"
                       disabled={loginMutation.isPending || registerMutation.isPending}
                     >
                       {(loginMutation.isPending || registerMutation.isPending) ? (
@@ -168,7 +168,7 @@ export default function AuthPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/80 rounded-3xl opacity-90" />
             <div className="relative p-6 text-primary-foreground h-full flex flex-col justify-center">
               <div className="mb-6">
-                <FileText className="w-12 h-12 mb-4" />
+                <FileText className="w-12 h-12 mb-4 animate-fade-in" />
                 <h1 className="text-xl font-bold mb-2">
                   Professional CV Review Service
                 </h1>

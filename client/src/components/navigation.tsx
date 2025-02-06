@@ -14,7 +14,7 @@ import {
 export function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [, setLocation] = useLocation();
-  
+
   const menuItems = [
     { href: "/", label: "HOME" },
     { href: "/resources", label: "DIGITAL LIBRARY" },
@@ -28,7 +28,7 @@ export function Navigation() {
         <Button
           key={item.href}
           variant="ghost"
-          className="justify-start lg:justify-center"
+          className="justify-start lg:justify-center hover:bg-primary/5 transition-colors duration-200"
           asChild
         >
           <Link href={item.href}>{item.label}</Link>
@@ -36,11 +36,19 @@ export function Navigation() {
       ))}
       {user ? (
         <>
-          <Button variant="outline" asChild>
+          <Button 
+            variant="outline" 
+            className="hover:border-primary/30 transition-colors duration-200"
+            asChild
+          >
             <Link href="/dashboard">DASHBOARD</Link>
           </Button>
           {user.isAdmin && (
-            <Button variant="outline" asChild>
+            <Button 
+              variant="outline"
+              className="hover:border-primary/30 transition-colors duration-200"
+              asChild
+            >
               <Link href="/admin">ADMIN PANEL</Link>
             </Button>
           )}
@@ -49,13 +57,17 @@ export function Navigation() {
             onClick={() => logoutMutation.mutate()}
             disabled={logoutMutation.isPending}
             size="sm"
+            className="hover:bg-destructive/10 hover:text-destructive transition-colors duration-200"
           >
             <LogOut className="w-4 h-4 mr-2" />
             LOGOUT
           </Button>
         </>
       ) : (
-        <Button className="bg-primary hover:bg-primary/90" asChild>
+        <Button 
+          className="bg-primary hover:bg-primary/90 transition-colors duration-200 shadow-sm hover:shadow-md"
+          asChild
+        >
           <Link href="/cv-submission">SUBMIT YOUR CV</Link>
         </Button>
       )}
@@ -67,7 +79,7 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/">
-            <span className="font-serif text-xl font-bold text-primary cursor-pointer">
+            <span className="font-serif text-xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity duration-200">
               RESUMATE
             </span>
           </Link>
@@ -80,13 +92,13 @@ export function Navigation() {
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden hover:bg-primary/5 transition-colors duration-200">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
             <SheetContent>
               <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
+                <SheetTitle className="font-serif">Menu</SheetTitle>
               </SheetHeader>
               <div className="mt-4">
                 {renderMenuItems()}
