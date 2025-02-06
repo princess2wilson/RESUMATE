@@ -68,8 +68,8 @@ export default function HomePage() {
                       <Link href="/admin">ADMIN PANEL</Link>
                     </Button>
                   )}
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     onClick={() => logoutMutation.mutate()}
                     disabled={logoutMutation.isPending}
                     size="sm"
@@ -89,7 +89,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <motion.section 
+      <motion.section
         className="relative min-h-screen flex items-center pt-16"
         initial="initial"
         animate="animate"
@@ -97,48 +97,48 @@ export default function HomePage() {
       >
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <motion.div 
+            <motion.div
               className="flex-1 space-y-8"
               variants={fadeIn}
             >
               <div className="space-y-6">
-                <motion.p 
+                <motion.p
                   className="uppercase-spaced text-primary flex items-center justify-center gap-2"
                   variants={slideIn}
                 >
                   <Sparkles className="w-5 h-5" />
                   TRANSFORM YOUR CAREER TODAY
                 </motion.p>
-                <motion.h1 
+                <motion.h1
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
                 >
                   Elevate Your Professional Story with
                   <span className="gradient-text"> Resumate</span>
                 </motion.h1>
-                <motion.p 
+                <motion.p
                   className="text-xl text-muted-foreground max-w-[800px] mx-auto leading-relaxed"
                   variants={fadeIn}
                 >
-                  Get expert CV reviews, access premium career resources, and receive personalized 
+                  Get expert CV reviews, access premium career resources, and receive personalized
                   guidance from industry professionals who understand your journey.
                 </motion.p>
               </div>
-              <motion.div 
+              <motion.div
                 className="flex flex-col sm:flex-row gap-4 justify-center"
                 variants={fadeIn}
               >
-                <Button 
-                  size="lg" 
-                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 uppercase-spaced" 
+                <Button
+                  size="lg"
+                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 uppercase-spaced"
                   onClick={scrollToServices}
                 >
                   EXPLORE SERVICES
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
+                <Button
+                  size="lg"
+                  variant="outline"
                   asChild
                   className="w-full sm:w-auto uppercase-spaced"
                 >
@@ -153,7 +153,7 @@ export default function HomePage() {
       </motion.section>
 
       {/* Free Resource Section */}
-      <motion.section 
+      <motion.section
         className="py-24 bg-gradient-to-b from-background to-muted"
         initial="initial"
         whileInView="animate"
@@ -161,13 +161,13 @@ export default function HomePage() {
         variants={staggerChildren}
       >
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="max-w-4xl mx-auto text-center"
             variants={fadeIn}
           >
             <h2 className="text-3xl font-serif font-bold mb-4">Get Your Free Career Guide</h2>
             <p className="text-muted-foreground mb-8">
-              Download our comprehensive guide packed with insider tips for crafting 
+              Download our comprehensive guide packed with insider tips for crafting
               the perfect CV and acing your interviews.
             </p>
             <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
@@ -189,8 +189,8 @@ export default function HomePage() {
       </motion.section>
 
       {/* Services Section */}
-      <motion.section 
-        id="services" 
+      <motion.section
+        id="services"
         className="py-24 bg-gray-50"
         initial="initial"
         whileInView="animate"
@@ -198,7 +198,7 @@ export default function HomePage() {
         variants={staggerChildren}
       >
         <div className="container mx-auto px-4">
-          <motion.div 
+          <motion.div
             className="text-center mb-16"
             variants={fadeIn}
           >
@@ -208,12 +208,12 @@ export default function HomePage() {
               Choose the service that best fits your career development needs
             </p>
           </motion.div>
-          <motion.div 
+          <motion.div
             className="grid md:grid-cols-3 gap-8"
             variants={staggerChildren}
           >
             {/* CV Review Service */}
-            <motion.div 
+            <motion.div
               variants={fadeIn}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
@@ -244,14 +244,14 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>GET REVIEW</Link>
+                    <Link href="/resources">GET REVIEW</Link>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
 
             {/* Digital Resources */}
-            <motion.div 
+            <motion.div
               variants={fadeIn}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
@@ -282,14 +282,14 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>ACCESS LIBRARY</Link>
+                    <Link href="/resources">ACCESS LIBRARY</Link>
                   </Button>
                 </CardContent>
               </Card>
             </motion.div>
 
             {/* Consultation */}
-            <motion.div 
+            <motion.div
               variants={fadeIn}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
@@ -320,7 +320,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href={user ? "/dashboard" : "/auth"}>BOOK NOW</Link>
+                    <Link href="/consultations">BOOK NOW</Link>
                   </Button>
                 </CardContent>
               </Card>

@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import {
   Dialog,
@@ -107,8 +107,8 @@ export default function ResourceLibraryPage() {
                     <CardDescription>{product.description}</CardDescription>
                   </CardHeader>
                   <CardFooter className="mt-auto pt-6">
-                    <Button 
-                      className="w-full" 
+                    <Button
+                      className="w-full"
                       onClick={() => setSelectedProduct(product)}
                     >
                       VIEW DETAILS
@@ -165,8 +165,16 @@ export default function ResourceLibraryPage() {
                     One-time purchase
                   </div>
                 </div>
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  BUY NOW
+                <Button
+                  className="w-full bg-primary hover:bg-primary/90"
+                  onClick={() => {
+                    if (!user) {
+                      window.location.href = '/auth';
+                    }
+                    // Add purchase logic here when user is logged in
+                  }}
+                >
+                  {user ? 'BUY NOW' : 'LOGIN TO PURCHASE'}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
