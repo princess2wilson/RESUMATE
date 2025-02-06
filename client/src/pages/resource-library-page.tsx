@@ -111,14 +111,6 @@ export default function ResourceLibraryPage() {
     }
   };
 
-  const handleCVReview = () => {
-    if (!user) {
-      setLocation('/auth?redirect=/cv-submission');
-    } else {
-      setLocation('/cv-submission');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
       <Particles
@@ -152,25 +144,24 @@ export default function ResourceLibraryPage() {
               </span>
             </Link>
             <div className="space-x-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (!user) {
+                    setLocation('/auth?redirect=/cv-submission');
+                  } else {
+                    setLocation('/cv-submission');
+                  }
+                }}
+              >
+                Submit CV for Review
+              </Button>
             </div>
           </div>
         </div>
       </nav>
 
       <main className="container mx-auto px-4 py-12 relative">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-primary/10 rounded-lg p-6 mb-8 text-center"
-        >
-          <h2 className="text-2xl font-bold text-primary mb-2">🎉 Special Launch Offer!</h2>
-          <p className="text-lg mb-4">
-            <span className="font-bold">70% OFF</span> on all digital resources!
-          </p>
-          <div className="text-sm text-muted-foreground">
-            Plus, get <span className="font-bold">70% OFF</span> on CV reviews - Limited to first 10 submissions!
-          </div>
-        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
