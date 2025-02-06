@@ -36,6 +36,10 @@ export function setupAuth(app: Express) {
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    cookie: {
+      secure: true,
+      sameSite: 'none'
+    }
   };
 
   if (app.get("env") === "production") {
@@ -103,11 +107,14 @@ export function setupAuth(app: Express) {
       {
         clientID: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        callbackURL: `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/linkedin/callback`,
+        callbackURL: `${process.env.REPL_ENVIRONMENT === 'production' 
+          ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
+          : 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev'}/api/auth/linkedin/callback`,
         scope: ["r_emailaddress", "r_liteprofile"],
-        passReqToCallback: true
+        passReqToCallback: true,
+        state: true
       },
-      async (req, accessToken, refreshToken, profile, done) => {
+      async (req: any, accessToken: string, refreshToken: string, profile: any, done: any) => {
         try {
           console.log("LinkedIn OAuth Profile Data:", {
             id: profile.id,
@@ -117,8 +124,12 @@ export function setupAuth(app: Express) {
             hasRefreshToken: !!refreshToken
           });
 
-          console.log("Request headers:", req.headers);
-          console.log("Request URL:", req.url);
+          console.log("Request details:", {
+            headers: req.headers,
+            url: req.url,
+            session: req.session ? "Present" : "Missing",
+            cookies: req.cookies
+          });
 
           let user = await storage.getUserByLinkedinId(profile.id);
           console.log("LinkedIn user lookup result:", user ? "Found existing user" : "No existing user found");
@@ -156,7 +167,10 @@ export function setupAuth(app: Express) {
   app.get(
     "/api/auth/linkedin",
     (req, res, next) => {
-      const callbackUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/linkedin/callback`;
+      const callbackUrl = `${process.env.REPL_ENVIRONMENT === 'production' 
+        ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
+        : 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev'}/api/auth/linkedin/callback`;
+
       console.log("Starting LinkedIn authentication", {
         callbackUrl,
         headers: req.headers,
@@ -177,7 +191,7 @@ export function setupAuth(app: Express) {
         cookies: req.cookies
       });
 
-      passport.authenticate("linkedin", (err, user, info) => {
+      passport.authenticate("linkedin", (err: any, user: any, info: any) => {
         if (err) {
           console.error("LinkedIn callback authentication error:", err);
           return res.redirect('/auth?error=linkedin_auth_failed');
@@ -201,15 +215,23 @@ export function setupAuth(app: Express) {
     }
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  // Session serialization
+  passport.serializeUser((user, done) => {
+    console.log("Serializing user:", user.id);
+    done(null, user.id);
+  });
+
   passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUser(id);
       if (!user) {
+        console.error("User not found during deserialization:", id);
         return done(new Error('User not found'), null);
       }
+      console.log("Deserialized user:", id);
       done(null, user);
     } catch (error) {
+      console.error("Error during deserialization:", error);
       done(error, null);
     }
   });
