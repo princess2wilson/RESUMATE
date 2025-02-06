@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
   useQuery,
@@ -24,7 +25,7 @@ type LoginData = Pick<InsertUser, "username" | "password">;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   const {
@@ -37,7 +38,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   });
 
   useEffect(() => {
-    // Check authentication status (e.g., from local storage or API)
     const authStatus = localStorage.getItem('isAuthenticated') === 'true';
     setIsAuthenticated(authStatus);
   }, []);
@@ -128,3 +128,13 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
+const App = () => {
+  return (
+    <AuthProvider>
+      {/* Your app content */}
+    </AuthProvider>
+  );
+};
+
+export default App;
