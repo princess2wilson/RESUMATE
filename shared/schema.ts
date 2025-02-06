@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -16,6 +16,7 @@ export const cvReviews = pgTable("cv_reviews", {
   status: text("status").notNull().default("pending"),
   feedback: text("feedback"),
   createdAt: text("created_at").notNull(),
+  isPromotional: boolean("is_promotional").notNull().default(false),
 });
 
 export const products = pgTable("products", {
@@ -23,14 +24,14 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
-  type: text("type").notNull(), // 'cv_template', 'interview_guide', etc.
+  type: text("type").notNull(),
   stripeProductId: text("stripe_product_id"),
   stripePriceId: text("stripe_price_id"),
 });
 
 export const consultations = pgTable("consultations", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id"),  // Made optional for guest bookings
+  userId: integer("user_id"),
   name: text("name").notNull(),
   email: text("email").notNull(),
   date: text("date").notNull(),
@@ -44,11 +45,12 @@ export const subscriptions = pgTable("subscriptions", {
   userId: integer("user_id").notNull(),
   stripeCustomerId: text("stripe_customer_id").notNull(),
   stripeSubscriptionId: text("stripe_subscription_id").notNull(),
-  status: text("status").notNull(), // 'active', 'canceled', 'past_due'
-  planType: text("plan_type").notNull(), // 'starter', 'pro', 'enterprise'
+  status: text("status").notNull(),
+  planType: text("plan_type").notNull(),
   currentPeriodEnd: text("current_period_end").notNull(),
 });
 
+// Schema exports
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -58,25 +60,8 @@ export const insertCVReviewSchema = createInsertSchema(cvReviews).pick({
   fileUrl: true,
 });
 
-export const insertConsultationSchema = createInsertSchema(consultations).pick({
-  name: true,
-  email: true,
-  date: true,
-  time: true,
-});
-
-export const insertSubscriptionSchema = createInsertSchema(subscriptions).pick({
-  stripeCustomerId: true,
-  stripeSubscriptionId: true,
-  status: true,
-  planType: true,
-  currentPeriodEnd: true,
-});
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type CVReview = typeof cvReviews.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type Consultation = typeof consultations.$inferSelect;
-export type InsertSubscription = z.infer<typeof insertSubscriptionSchema>;
-export type Subscription = typeof subscriptions.$inferSelect;

@@ -143,7 +143,6 @@ export default function ResourceLibraryPage() {
         }}
       />
 
-      {/* Navigation */}
       <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
@@ -153,18 +152,25 @@ export default function ResourceLibraryPage() {
               </span>
             </Link>
             <div className="space-x-4">
-              {/*user && (
-                <Button variant="outline" asChild>
-                  <Link href="/dashboard">DASHBOARD</Link>
-                </Button>
-              )*/}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-12 relative">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-primary/10 rounded-lg p-6 mb-8 text-center"
+        >
+          <h2 className="text-2xl font-bold text-primary mb-2">🎉 Special Launch Offer!</h2>
+          <p className="text-lg mb-4">
+            <span className="font-bold">70% OFF</span> on all digital resources!
+          </p>
+          <div className="text-sm text-muted-foreground">
+            Plus, get <span className="font-bold">70% OFF</span> on CV reviews - Limited to first 10 submissions!
+          </div>
+        </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -176,7 +182,6 @@ export default function ResourceLibraryPage() {
           </p>
         </motion.div>
 
-        {/* Resource Grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -219,12 +224,13 @@ export default function ResourceLibraryPage() {
           })}
         </motion.div>
 
-        {/* Product Details Dialog */}
         <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                <IconComponent className="w-6 h-6 text-primary" />
+                {selectedProduct && (
+                  <FileText className="w-6 h-6 text-primary" />
+                )}
               </div>
               <DialogTitle className="text-2xl font-serif">
                 {selectedProduct?.name}
@@ -234,7 +240,6 @@ export default function ResourceLibraryPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-6">
-              {/* Product Features */}
               <div>
                 <h4 className="font-semibold mb-3">What's Included:</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
@@ -253,7 +258,6 @@ export default function ResourceLibraryPage() {
                 </ul>
               </div>
 
-              {/* Price and Payment */}
               <div className="space-y-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold">

@@ -5,7 +5,8 @@ import { eq } from "drizzle-orm";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import * as schema from "@shared/schema";
-import { subscriptions, type Subscription } from "@shared/schema";
+import { subscriptions } from "@shared/schema";
+import { sql } from "drizzle-orm";
 
 const PostgresSessionStore = connectPg(session);
 
@@ -27,13 +28,12 @@ export interface IStorage {
   getConsultations(userId: number): Promise<Consultation[]>;
 
   sessionStore: session.Store;
-  // Add new subscription methods
-  createSubscription(subscription: Omit<Subscription, "id">): Promise<Subscription>;
-  getSubscription(userId: number): Promise<Subscription | undefined>;
+  createSubscription(subscription: Omit<typeof subscriptions.$inferSelect, "id">): Promise<typeof subscriptions.$inferSelect>;
+  getSubscription(userId: number): Promise<typeof subscriptions.$inferSelect | undefined>;
   updateSubscription(
     stripeSubscriptionId: string,
-    update: Partial<Subscription>
-  ): Promise<Subscription>;
+    update: Partial<typeof subscriptions.$inferSelect>
+  ): Promise<typeof subscriptions.$inferSelect>;
   getStripeCustomer(userId: number): Promise<{ id: string } | undefined>;
   setStripeCustomer(userId: number, stripeCustomerId: string): Promise<void>;
 }
@@ -47,7 +47,6 @@ export class DatabaseStorage implements IStorage {
       createTableIfMissing: true,
     });
 
-    // Seed some initial products
     this.seedProducts();
   }
 
@@ -156,7 +155,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(schema.consultations.userId, userId));
   }
 
-  async createSubscription(subscription: Omit<Subscription, "id">): Promise<Subscription> {
+  async createSubscription(subscription: Omit<typeof subscriptions.$inferSelect, "id">): Promise<typeof subscriptions.$inferSelect> {
     const [newSubscription] = await db
       .insert(subscriptions)
       .values(subscription)
@@ -164,7 +163,7 @@ export class DatabaseStorage implements IStorage {
     return newSubscription;
   }
 
-  async getSubscription(userId: number): Promise<Subscription | undefined> {
+  async getSubscription(userId: number): Promise<typeof subscriptions.$inferSelect | undefined> {
     const [subscription] = await db
       .select()
       .from(subscriptions)
@@ -174,8 +173,8 @@ export class DatabaseStorage implements IStorage {
 
   async updateSubscription(
     stripeSubscriptionId: string,
-    update: Partial<Subscription>
-  ): Promise<Subscription> {
+    update: Partial<typeof subscriptions.$inferSelect>
+  ): Promise<typeof subscriptions.$inferSelect> {
     const [updated] = await db
       .update(subscriptions)
       .set(update)
@@ -193,7 +192,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async setStripeCustomer(userId: number, stripeCustomerId: string): Promise<void> {
-    // This is handled through createSubscription, no need for a separate table
     return;
   }
 }
