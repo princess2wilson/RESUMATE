@@ -20,7 +20,6 @@ import { useAuth } from "@/hooks/use-auth";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Engine } from "@tsparticles/engine";
 import {
   SiMastercard,
   SiVisa,
@@ -74,19 +73,12 @@ const itemVariants = {
   },
 };
 
-// Add formatPrice utility function
 const formatPrice = (amount: number) => {
-  try {
-    return new Intl.NumberFormat(navigator.language || 'en-US', {
-      style: 'currency',
-      currency: 'USD', // Base currency is USD
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount / 100);
-  } catch (error) {
-    // Fallback formatting if Intl.NumberFormat fails
-    return `$${(amount / 100).toFixed(2)}`;
-  }
+  return `$${(amount / 100).toFixed(2)}`;
+};
+
+const calculateDiscountedPrice = (price: number) => {
+  return Math.floor(price * 0.5); // 50% off
 };
 
 export default function ResourceLibraryPage() {
@@ -98,7 +90,6 @@ export default function ResourceLibraryPage() {
   const { data: products } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
-
 
   const handlePurchase = async (product: Product) => {
     try {
@@ -122,12 +113,8 @@ export default function ResourceLibraryPage() {
     }
   };
 
-  const calculateDiscountedPrice = (price: number) => {
-    return Math.floor(price * 0.5); // 50% off
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
@@ -140,7 +127,7 @@ export default function ResourceLibraryPage() {
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-12 relative">
+      <main className="container mx-auto px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -162,17 +149,14 @@ export default function ResourceLibraryPage() {
         >
           {products?.map((product) => {
             const Icon = resourceIcons[product.type as ResourceType] || FileText;
-            const originalPrice = product.price;
-            const discountedPrice = calculateDiscountedPrice(originalPrice);
+            const discountedPrice = calculateDiscountedPrice(product.price);
 
             return (
               <motion.div
                 key={product.id}
                 variants={itemVariants}
-                whileHover={{
-                  y: -5,
-                  transition: { duration: 0.3 }
-                }}
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.3 }}
                 className="h-full"
               >
                 <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
@@ -182,14 +166,14 @@ export default function ResourceLibraryPage() {
                       50% OFF
                     </Badge>
                   </div>
-                  <CardHeader className="flex-none pb-6">
+                  <CardHeader>
                     <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <CardTitle className="font-serif">{product.name}</CardTitle>
                     <CardDescription>{product.description}</CardDescription>
                   </CardHeader>
-                  <CardContent className="pt-0 flex-1 flex flex-col">
+                  <CardContent className="flex-1 flex flex-col">
                     <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
@@ -207,9 +191,6 @@ export default function ResourceLibraryPage() {
                     <div className="mt-auto">
                       <div className="mb-4">
                         <span className="text-2xl font-bold">{formatPrice(discountedPrice)}</span>
-                        <span className="text-sm text-muted-foreground line-through ml-2">
-                          {formatPrice(originalPrice)}
-                        </span>
                       </div>
                       <Button
                         className="w-full group"
