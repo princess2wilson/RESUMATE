@@ -36,6 +36,7 @@ export interface IStorage {
   ): Promise<typeof subscriptions.$inferSelect>;
   getStripeCustomer(userId: number): Promise<{ id: string } | undefined>;
   setStripeCustomer(userId: number, stripeCustomerId: string): Promise<void>;
+  getUserByLinkedinId(linkedinId: string): Promise<User | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -193,6 +194,16 @@ export class DatabaseStorage implements IStorage {
 
   async setStripeCustomer(userId: number, stripeCustomerId: string): Promise<void> {
     return;
+  }
+
+  async getUserByLinkedinId(linkedinId: string): Promise<User | undefined> {
+    console.log("Looking up user by LinkedIn ID:", linkedinId);
+    const [user] = await db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.linkedinId, linkedinId));
+    console.log("LinkedIn user lookup result:", user ? "Found" : "Not found");
+    return user;
   }
 }
 

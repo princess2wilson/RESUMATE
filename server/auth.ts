@@ -105,22 +105,32 @@ export function setupAuth(app: Express) {
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
         callbackURL: "https://workspace.princess2wilson.repl.co/api/auth/linkedin/callback",
         scope: ["r_emailaddress", "r_liteprofile"],
-        state: true, // Enable state parameter for security
+        passReqToCallback: true,
+        state: true,
       },
-      async (accessToken, refreshToken, profile, done) => {
+      async (req, accessToken, refreshToken, profile, done) => {
         try {
-          console.log("LinkedIn auth callback received", { profileId: profile.id });
+          console.log("LinkedIn auth callback received", { 
+            profileId: profile.id,
+            emails: profile.emails,
+            displayName: profile.displayName
+          });
+
           let user = await storage.getUserByLinkedinId(profile.id);
 
           if (!user) {
-            // Create new user if doesn't exist
             console.log("Creating new user for LinkedIn profile", { 
               email: profile.emails?.[0]?.value,
-              id: profile.id 
+              id: profile.id,
+              displayName: profile.displayName
             });
 
+            const username = profile.emails?.[0]?.value || 
+                           profile.displayName?.replace(/\s+/g, '_').toLowerCase() || 
+                           `linkedin_${profile.id}`;
+
             user = await storage.createUser({
-              username: profile.emails?.[0]?.value || `linkedin_${profile.id}`,
+              username,
               password: await hashPassword(randomBytes(32).toString("hex")),
               linkedinId: profile.id,
               email: profile.emails?.[0]?.value,
@@ -229,7 +239,10 @@ export function setupAuth(app: Express) {
     "/api/auth/linkedin",
     (req, res, next) => {
       console.log("Starting LinkedIn authentication");
-      passport.authenticate("linkedin")(req, res, next);
+      passport.authenticate("linkedin", {
+        state: true,
+        scope: ["r_emailaddress", "r_liteprofile"]
+      })(req, res, next);
     }
   );
 
@@ -243,7 +256,7 @@ export function setupAuth(app: Express) {
         }
 
         if (!user) {
-          console.error("LinkedIn auth: No user returned");
+          console.error("LinkedIn auth: No user returned", { info });
           return res.redirect('/auth?error=linkedin_auth_failed');
         }
 
@@ -252,6 +265,8 @@ export function setupAuth(app: Express) {
             console.error("Login error after LinkedIn auth:", loginErr);
             return res.redirect('/auth?error=login_failed');
           }
+
+          console.log("LinkedIn authentication successful, redirecting to dashboard");
           return res.redirect('/dashboard');
         });
       })(req, res, next);
