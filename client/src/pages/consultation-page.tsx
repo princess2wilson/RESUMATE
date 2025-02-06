@@ -1,7 +1,6 @@
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
 import { ConsultationForm } from "@/components/consultation-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Calendar, Video, Users } from "lucide-react";
 
@@ -17,9 +16,6 @@ export default function ConsultationPage() {
                 RESUMATE
               </span>
             </Link>
-            <Button variant="outline" asChild>
-              <Link href="/resources">BROWSE RESOURCES</Link>
-            </Button>
           </div>
         </div>
       </nav>
@@ -28,7 +24,7 @@ export default function ConsultationPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-12">
             <h1 className="text-4xl font-serif font-bold mb-4">Book Your Consultation</h1>
@@ -37,22 +33,18 @@ export default function ConsultationPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Booking Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Schedule Your Session</CardTitle>
-                <CardDescription>
-                  Choose a date and time that works best for you
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ConsultationForm />
-              </CardContent>
-            </Card>
+          <div className="grid lg:grid-cols-5 gap-8">
+            {/* Calendly Widget - Takes up more space */}
+            <div className="lg:col-span-3">
+              <Card>
+                <CardContent className="p-6">
+                  <ConsultationForm />
+                </CardContent>
+              </Card>
+            </div>
 
-            {/* Features */}
-            <div className="space-y-6">
+            {/* Features - Takes up less space */}
+            <div className="lg:col-span-2 space-y-6">
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -67,7 +59,7 @@ export default function ConsultationPage() {
                       <div>
                         <h3 className="font-semibold mb-1">Virtual Sessions</h3>
                         <p className="text-sm text-muted-foreground">
-                          Meet via Google Meet from anywhere in the world
+                          Meet via video conference from anywhere in the world
                         </p>
                       </div>
                     </div>
