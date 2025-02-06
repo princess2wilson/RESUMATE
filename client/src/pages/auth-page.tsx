@@ -16,8 +16,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema, type InsertUser } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Loader2 } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FileText, Loader2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function AuthPage() {
   const { loginMutation, registerMutation, user } = useAuth();
@@ -47,8 +47,18 @@ export default function AuthPage() {
         await registerMutation.mutateAsync(data);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An error occurred";
-      setError(errorMessage);
+      if (err instanceof Error) {
+        // Convert backend error messages to user-friendly messages
+        if (err.message.includes("Invalid username or password")) {
+          setError("The username or password you entered is incorrect. Please try again.");
+        } else if (err.message.includes("Username already exists")) {
+          setError("This username is already taken. Please choose a different one.");
+        } else {
+          setError("Something went wrong. Please try again later.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -75,6 +85,8 @@ export default function AuthPage() {
 
               {error && (
                 <Alert variant="destructive" className="mb-6">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Authentication Error</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
@@ -92,6 +104,7 @@ export default function AuthPage() {
                             placeholder="Enter your username"
                             {...field}
                             disabled={loginMutation.isPending || registerMutation.isPending}
+                            className="focus:ring-2 focus:ring-primary"
                           />
                         </FormControl>
                         <FormMessage />
@@ -111,6 +124,7 @@ export default function AuthPage() {
                             placeholder="Enter your password"
                             {...field}
                             disabled={loginMutation.isPending || registerMutation.isPending}
+                            className="focus:ring-2 focus:ring-primary"
                           />
                         </FormControl>
                         <FormMessage />
