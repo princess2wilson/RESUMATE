@@ -19,6 +19,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // Add this new route to help with OAuth configuration
+  app.get("/api/auth/config", (req, res) => {
+    const baseUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+    res.json({
+      googleRedirectUrl: `${baseUrl}/api/auth/google/callback`,
+      linkedinRedirectUrl: `${baseUrl}/api/auth/linkedin/callback`,
+      message: "Add these URLs to your OAuth provider's authorized redirect URLs"
+    });
+  });
+
   // CV Review routes (require authentication)
   app.post("/api/cv-review", upload.single("file"), async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
