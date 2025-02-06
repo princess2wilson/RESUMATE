@@ -135,6 +135,17 @@ export default function HomePage() {
                   EXPLORE SERVICES
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  asChild
+                  className="w-full sm:w-auto uppercase-spaced"
+                >
+                  <Link href="/resources">
+                    VIEW DIGITAL LIBRARY
+                    <Sparkles className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
               </motion.div>
             </motion.div>
           </div>
@@ -170,8 +181,9 @@ export default function HomePage() {
               variants={fadeIn}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
+              className="h-full"
             >
-              <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
+              <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                 <div className="absolute top-4 right-4">
                   <Badge variant="secondary" className="bg-primary/10 text-primary">
                     <Sparkles className="w-4 h-4 mr-1" />
@@ -185,8 +197,8 @@ export default function HomePage() {
                   <CardTitle className="font-serif">CV REVIEW</CardTitle>
                   <CardDescription>Professional CV Review & Feedback</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-sm text-muted-foreground mb-6">
+                <CardContent className="flex-1 flex flex-col">
+                  <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
                       Detailed analysis & scoring
@@ -200,7 +212,7 @@ export default function HomePage() {
                       48-hour turnaround
                     </li>
                   </ul>
-                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
+                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced mt-auto" asChild>
                     <Link href="/cv-submission">GET REVIEW</Link>
                   </Button>
                 </CardContent>
@@ -212,8 +224,9 @@ export default function HomePage() {
               variants={fadeIn}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
+              className="h-full"
             >
-              <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
+              <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                 <div className="absolute top-4 right-4">
                   <Badge variant="secondary" className="bg-primary/10 text-primary">
                     <Sparkles className="w-4 h-4 mr-1" />
@@ -227,8 +240,8 @@ export default function HomePage() {
                   <CardTitle className="font-serif">RESOURCE LIBRARY</CardTitle>
                   <CardDescription>Premium Templates & Guides</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-sm text-muted-foreground mb-6">
+                <CardContent className="flex-1 flex flex-col">
+                  <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
                       CV Templates
@@ -242,7 +255,7 @@ export default function HomePage() {
                       Career Resources
                     </li>
                   </ul>
-                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
+                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced mt-auto" asChild>
                     <Link href="/resources">
                       ACCESS LIBRARY
                       <Sparkles className="w-4 h-4 ml-2" />
@@ -257,8 +270,9 @@ export default function HomePage() {
               variants={fadeIn}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
+              className="h-full"
             >
-              <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
+              <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <Users className="w-6 h-6 text-primary" />
@@ -268,8 +282,8 @@ export default function HomePage() {
                     One-on-One Career Guidance
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 text-sm text-muted-foreground mb-6">
+                <CardContent className="flex-1 flex flex-col">
+                  <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
                       Career Strategy Session
@@ -283,7 +297,7 @@ export default function HomePage() {
                       Mentoring Available
                     </li>
                   </ul>
-                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
+                  <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced mt-auto" asChild>
                     <Link href="/consultations">BOOK NOW</Link>
                   </Button>
                 </CardContent>
