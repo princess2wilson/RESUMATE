@@ -103,7 +103,7 @@ export function setupAuth(app: Express) {
       {
         clientID: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        callbackURL: `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/linkedin/callback`,
+        callbackURL: "https://workspace.princess2wilson.repl.co/api/auth/linkedin/callback",
         scope: ["r_emailaddress", "r_liteprofile"],
       },
       async (accessToken, refreshToken, profile, done) => {
