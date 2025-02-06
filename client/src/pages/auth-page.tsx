@@ -121,19 +121,6 @@ export default function AuthPage() {
                     </p>
                   </div>
                 )}
-                {activeTab === "register" && (
-                  <div className="mb-6 text-sm bg-primary/5 border border-primary/10 p-4 rounded-lg">
-                    <p className="flex items-start gap-2">
-                      <Heart className="w-4 h-4 mt-0.5 text-primary" />
-                      <span>
-                        Join our community of professionals improving their career prospects.
-                        <span className="block mt-1 text-muted-foreground">
-                          Get personalized CV feedback from industry experts!
-                        </span>
-                      </span>
-                    </p>
-                  </div>
-                )}
 
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
