@@ -107,12 +107,9 @@ export function setupAuth(app: Express) {
       {
         clientID: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        callbackURL: `${process.env.REPL_ENVIRONMENT === 'production' 
-          ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
-          : 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev'}/api/auth/linkedin/callback`,
+        callbackURL: 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev/api/auth/linkedin/callback',
         scope: ["r_emailaddress", "r_liteprofile"],
-        passReqToCallback: true,
-        state: true
+        passReqToCallback: true
       },
       async (req: any, accessToken: string, refreshToken: string, profile: any, done: any) => {
         try {
@@ -167,12 +164,7 @@ export function setupAuth(app: Express) {
   app.get(
     "/api/auth/linkedin",
     (req, res, next) => {
-      const callbackUrl = `${process.env.REPL_ENVIRONMENT === 'production' 
-        ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
-        : 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev'}/api/auth/linkedin/callback`;
-
       console.log("Starting LinkedIn authentication", {
-        callbackUrl,
         headers: req.headers,
         session: req.session
       });
