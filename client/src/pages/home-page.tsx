@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles, Mail } from "lucide-react";
+import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -88,7 +88,7 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section - Updated with Digital Library Promotion */}
+      {/* Hero Section */}
       <motion.section
         className="relative min-h-screen flex items-center pt-16"
         initial="initial"
@@ -102,18 +102,12 @@ export default function HomePage() {
               variants={fadeIn}
             >
               <div className="space-y-6">
-                <motion.div
-                  className="flex items-center justify-center gap-2"
+                <motion.p
+                  className="uppercase-spaced text-primary flex items-center justify-center gap-2"
                   variants={slideIn}
                 >
-                  <p className="uppercase-spaced text-primary">
-                    TRANSFORM YOUR CAREER TODAY
-                  </p>
-                  <Badge variant="secondary" className="bg-primary/10 text-primary">
-                    <Sparkles className="w-4 h-4 mr-1" />
-                    50% OFF ALL RESOURCES
-                  </Badge>
-                </motion.div>
+                  TRANSFORM YOUR CAREER TODAY
+                </motion.p>
                 <motion.h1
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
@@ -141,84 +135,13 @@ export default function HomePage() {
                   EXPLORE SERVICES
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  asChild
-                  className="w-full sm:w-auto uppercase-spaced"
-                >
-                  <Link href="/resources">
-                    VIEW DIGITAL LIBRARY
-                    <Sparkles className="w-4 h-4 ml-2" />
-                  </Link>
-                </Button>
               </motion.div>
             </motion.div>
           </div>
         </div>
       </motion.section>
 
-      {/* Promotional Section */}
-      <motion.section
-        className="py-12 bg-primary/5"
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
-        variants={staggerChildren}
-      >
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="max-w-4xl mx-auto text-center"
-            variants={fadeIn}
-          >
-            <h2 className="text-3xl font-serif font-bold mb-4">🎉 Limited Time Offer!</h2>
-            <p className="text-xl mb-2">
-              Get your CV reviewed with <span className="font-bold text-primary">70% OFF</span>
-            </p>
-            <p className="text-muted-foreground">
-              Only available for the first 10 submissions - Don't miss out!
-            </p>
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* Free Resource Section */}
-      <motion.section
-        className="py-24 bg-gradient-to-b from-background to-muted"
-        initial="initial"
-        whileInView="animate"
-        viewport={{ once: true }}
-        variants={staggerChildren}
-      >
-        <div className="container mx-auto px-4">
-          <motion.div
-            className="max-w-4xl mx-auto text-center"
-            variants={fadeIn}
-          >
-            <h2 className="text-3xl font-serif font-bold mb-4">Get Your Free Career Guide</h2>
-            <p className="text-muted-foreground mb-8">
-              Download our comprehensive guide packed with insider tips for crafting
-              the perfect CV and acing your interviews.
-            </p>
-            <form onSubmit={handleEmailSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1"
-                required
-              />
-              <Button type="submit" className="uppercase-spaced">
-                <Mail className="w-4 h-4 mr-2" />
-                GET FREE GUIDE
-              </Button>
-            </form>
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* Services Section - Updated Digital Resources Card */}
+      {/* Services Section */}
       <motion.section
         id="services"
         className="py-24 bg-gray-50"
@@ -249,6 +172,12 @@ export default function HomePage() {
               transition={{ duration: 0.3 }}
             >
               <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
+                <div className="absolute top-4 right-4">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    <Sparkles className="w-4 h-4 mr-1" />
+                    70% OFF
+                  </Badge>
+                </div>
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <FileText className="w-6 h-6 text-primary" />
@@ -278,7 +207,7 @@ export default function HomePage() {
               </Card>
             </motion.div>
 
-            {/* Digital Resources - Updated with promotion */}
+            {/* Digital Resources */}
             <motion.div
               variants={fadeIn}
               whileHover={{ y: -5 }}
