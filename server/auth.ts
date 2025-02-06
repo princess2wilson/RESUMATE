@@ -103,9 +103,8 @@ export function setupAuth(app: Express) {
       {
         clientID: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        callbackURL: `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/linkedin/callback`,
+        callbackURL: "http://localhost:5000/api/auth/linkedin/callback",
         scope: ["r_emailaddress", "r_liteprofile"],
-        state: true,
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -240,9 +239,7 @@ export function setupAuth(app: Express) {
   app.get(
     "/api/auth/linkedin",
     (req, res, next) => {
-      console.log("Starting LinkedIn authentication", {
-        callbackUrl: `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/linkedin/callback`
-      });
+      console.log("Starting LinkedIn authentication");
       passport.authenticate("linkedin")(req, res, next);
     }
   );
@@ -252,7 +249,6 @@ export function setupAuth(app: Express) {
     (req, res, next) => {
       console.log("LinkedIn callback received", { 
         query: req.query,
-        state: req.query.state,
         code: req.query.code ? "present" : "missing",
         error: req.query.error
       });
