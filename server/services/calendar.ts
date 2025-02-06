@@ -4,12 +4,11 @@ import { format } from 'date-fns';
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  'https://developers.google.com/oauthplayground'  // Using playground for simplicity
+  'https://developers.google.com/oauthplayground'  // Changed to use OAuth Playground
 );
 
 // Set credentials
 oauth2Client.setCredentials({
-  access_token: process.env.GOOGLE_ACCESS_TOKEN,
   refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
 });
 
@@ -21,36 +20,40 @@ export async function createConsultationEvent(consultation: {
   email: string;
   name: string;
 }) {
-  const { date, time, email, name } = consultation;
-  const startTime = new Date(`${date}T${time}`);
-  const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour duration
-
-  const event = {
-    summary: 'Career Consultation Session',
-    description: `Career consultation session with ${name}`,
-    start: {
-      dateTime: startTime.toISOString(),
-      timeZone: 'UTC',
-    },
-    end: {
-      dateTime: endTime.toISOString(),
-      timeZone: 'UTC',
-    },
-    attendees: [{ email }],
-    conferenceData: {
-      createRequest: {
-        requestId: `consultation-${Date.now()}`,
-        conferenceSolutionKey: { type: 'hangoutsMeet' },
-      },
-    },
-  };
-
   try {
+    const { date, time, email, name } = consultation;
+    const startTime = new Date(`${date}T${time}`);
+    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000); // 1 hour duration
+
+    const event = {
+      summary: 'Career Consultation Session',
+      description: `Career consultation session with ${name}`,
+      start: {
+        dateTime: startTime.toISOString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      end: {
+        dateTime: endTime.toISOString(),
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      },
+      attendees: [{ email }],
+      conferenceData: {
+        createRequest: {
+          requestId: `consultation-${Date.now()}`,
+          conferenceSolutionKey: { type: 'hangoutsMeet' },
+        },
+      },
+    };
+
     const response = await calendar.events.insert({
       calendarId: process.env.GOOGLE_CALENDAR_ID,
       requestBody: event,
       conferenceDataVersion: 1,
     });
+
+    if (!response.data) {
+      throw new Error('Failed to create calendar event');
+    }
 
     return {
       eventId: response.data.id,

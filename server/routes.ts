@@ -3,9 +3,8 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import multer from "multer";
-import { insertCVReviewSchema, insertConsultationSchema } from "@shared/schema";
+import { insertCVReviewSchema } from "@shared/schema";
 import Stripe from "stripe";
-import { createConsultationEvent } from './services/calendar';
 
 const upload = multer({ dest: "uploads/" });
 
@@ -33,38 +32,6 @@ export function registerRoutes(app: Express): Server {
       createdAt: new Date().toISOString(),
     });
     res.json(review);
-  });
-
-  // Consultation routes (no auth required)
-  app.post("/api/consultations", async (req, res) => {
-    try {
-      const parsedData = insertConsultationSchema.parse(req.body);
-
-      // Create calendar event
-      const calendarEvent = await createConsultationEvent({
-        date: parsedData.date,
-        time: parsedData.time,
-        email: parsedData.email,
-        name: parsedData.name,
-      });
-
-      const consultation = await storage.createConsultation({
-        ...parsedData,
-        status: "confirmed",
-        meetLink: calendarEvent.meetLink,
-      });
-
-      res.json({ 
-        ...consultation,
-        meetLink: calendarEvent.meetLink 
-      });
-    } catch (error) {
-      console.error('Error booking consultation:', error);
-      res.status(500).json({ 
-        error: 'Failed to book consultation',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
   });
 
   // Product routes (no auth required)
@@ -158,11 +125,10 @@ export function registerRoutes(app: Express): Server {
     res.json(review);
   });
 
-
-  app.get("/api/consultations", async (req, res) => {
+  app.get("/api/subscription", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    const consultations = await storage.getConsultations(req.user.id);
-    res.json(consultations);
+    const subscription = await storage.getSubscription(req.user.id);
+    res.json(subscription);
   });
 
   app.post("/api/webhooks", async (req, res) => {
@@ -210,11 +176,6 @@ export function registerRoutes(app: Express): Server {
     res.json({ received: true });
   });
 
-  app.get("/api/subscription", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    const subscription = await storage.getSubscription(req.user.id);
-    res.json(subscription);
-  });
 
   const httpServer = createServer(app);
   return httpServer;
