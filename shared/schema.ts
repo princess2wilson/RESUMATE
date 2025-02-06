@@ -7,6 +7,8 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
+  googleId: text("google_id").unique(),
+  email: text("email").unique(),
 });
 
 export const cvReviews = pgTable("cv_reviews", {
@@ -54,6 +56,8 @@ export const subscriptions = pgTable("subscriptions", {
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
+  googleId: true,
+  email: true,
 });
 
 export const insertCVReviewSchema = createInsertSchema(cvReviews).pick({
