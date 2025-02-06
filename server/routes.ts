@@ -21,11 +21,21 @@ export function registerRoutes(app: Express): Server {
 
   // Add this new route to help with OAuth configuration
   app.get("/api/auth/config", (req, res) => {
-    const baseUrl = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;
+    const replSlug = process.env.REPL_SLUG || '';
+    const replOwner = process.env.REPL_OWNER || '';
+    const baseUrl = `https://${replSlug}.${replOwner}.repl.co`;
+
     res.json({
-      googleRedirectUrl: `${baseUrl}/api/auth/google/callback`,
-      linkedinRedirectUrl: `${baseUrl}/api/auth/linkedin/callback`,
-      message: "Add these URLs to your OAuth provider's authorized redirect URLs"
+      replDetails: {
+        replSlug,
+        replOwner,
+        fullDomain: `${replSlug}.${replOwner}.repl.co`
+      },
+      redirectUrls: {
+        google: `${baseUrl}/api/auth/google/callback`,
+        linkedin: `${baseUrl}/api/auth/linkedin/callback`
+      },
+      instructions: "Add these URLs to your OAuth provider's authorized redirect URLs"
     });
   });
 
