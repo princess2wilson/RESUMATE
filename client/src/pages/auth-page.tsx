@@ -16,12 +16,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema, type InsertUser } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AuthPage() {
   const { loginMutation, registerMutation, user } = useAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<InsertUser>({
     resolver: zodResolver(insertUserSchema),
@@ -37,10 +39,16 @@ export default function AuthPage() {
   }
 
   const onSubmit = async (data: InsertUser) => {
-    if (activeTab === "login") {
-      await loginMutation.mutateAsync(data);
-    } else {
-      await registerMutation.mutateAsync(data);
+    setError(null);
+    try {
+      if (activeTab === "login") {
+        await loginMutation.mutateAsync(data);
+      } else {
+        await registerMutation.mutateAsync(data);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
     }
   };
 
@@ -65,6 +73,12 @@ export default function AuthPage() {
                 <TabsTrigger value="register">Register</TabsTrigger>
               </TabsList>
 
+              {error && (
+                <Alert variant="destructive" className="mb-6">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                   <FormField
@@ -74,7 +88,11 @@ export default function AuthPage() {
                       <FormItem>
                         <Label>Username</Label>
                         <FormControl>
-                          <Input placeholder="Enter your username" {...field} />
+                          <Input 
+                            placeholder="Enter your username"
+                            {...field}
+                            disabled={loginMutation.isPending || registerMutation.isPending}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -88,7 +106,12 @@ export default function AuthPage() {
                       <FormItem>
                         <Label>Password</Label>
                         <FormControl>
-                          <Input type="password" placeholder="Enter your password" {...field} />
+                          <Input 
+                            type="password"
+                            placeholder="Enter your password"
+                            {...field}
+                            disabled={loginMutation.isPending || registerMutation.isPending}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -100,7 +123,14 @@ export default function AuthPage() {
                     className="w-full"
                     disabled={loginMutation.isPending || registerMutation.isPending}
                   >
-                    {activeTab === "login" ? "Login" : "Create Account"}
+                    {(loginMutation.isPending || registerMutation.isPending) ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {activeTab === "login" ? "Logging in..." : "Creating account..."}
+                      </>
+                    ) : (
+                      activeTab === "login" ? "Login" : "Create Account"
+                    )}
                   </Button>
                 </form>
               </Form>
