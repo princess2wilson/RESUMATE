@@ -167,45 +167,6 @@ export default function ResourceLibraryPage() {
         >
           {products?.map((product) => {
             const Icon = resourceIcons[product.type as ResourceType] || FileText;
-            if (product.type === 'cv_template') {
-              return (
-                <motion.div
-                  key={product.id}
-                  variants={itemVariants}
-                  whileHover={{
-                    y: -10,
-                    transition: { type: "spring", stiffness: 300 }
-                  }}
-                >
-                  <Card className="h-full flex flex-col group hover:shadow-xl transition-all duration-300 hover:border-primary/20">
-                    <CardHeader>
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <Icon className="w-6 h-6 text-primary" />
-                      </div>
-                      <CardTitle>{product.name}</CardTitle>
-                      <CardDescription>{product.description}</CardDescription>
-                    </CardHeader>
-                    <CardFooter className="mt-auto pt-6">
-                      <Button
-                        className="w-full group"
-                        onClick={() => {
-                          if (!user) {
-                            setLocation('/auth?redirect=/cv-submission');
-                          } else {
-                            setLocation('/cv-submission');
-                          }
-                        }}
-                      >
-                        <span className="group-hover:translate-x-1 transition-transform duration-300">
-                          SUBMIT YOUR CV FOR REVIEW
-                        </span>
-                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              );
-            }
             return (
               <motion.div
                 key={product.id}

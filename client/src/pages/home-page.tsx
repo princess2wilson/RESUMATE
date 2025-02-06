@@ -249,9 +249,7 @@ export default function HomePage() {
                     <FileText className="w-6 h-6 text-primary" />
                   </div>
                   <CardTitle className="font-serif">CV REVIEW</CardTitle>
-                  <CardDescription>
-                    Professional CV Review & Feedback
-                  </CardDescription>
+                  <CardDescription>Professional CV Review & Feedback</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3 text-sm text-muted-foreground mb-6">
@@ -287,9 +285,7 @@ export default function HomePage() {
                     <BookOpen className="w-6 h-6 text-primary" />
                   </div>
                   <CardTitle className="font-serif">RESOURCE LIBRARY</CardTitle>
-                  <CardDescription>
-                    Premium Templates & Guides
-                  </CardDescription>
+                  <CardDescription>Premium Templates & Guides</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3 text-sm text-muted-foreground mb-6">
@@ -307,7 +303,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href="/cv-submission">ACCESS LIBRARY</Link>
+                    <Link href="/resources">ACCESS LIBRARY</Link>
                   </Button>
                 </CardContent>
               </Card>
