@@ -51,23 +51,29 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await storage.getUserByUsername(username);
-        if (!user) {
-          return done(null, false, { message: "Invalid username or password" });
-        }
+    new LocalStrategy(
+      {
+        usernameField: 'email',
+        passwordField: 'password'
+      },
+      async (email, password, done) => {
+        try {
+          const user = await storage.getUserByEmail(email);
+          if (!user) {
+            return done(null, false, { message: "Invalid email or password" });
+          }
 
-        const isValidPassword = await comparePasswords(password, user.password);
-        if (!isValidPassword) {
-          return done(null, false, { message: "Invalid username or password" });
-        }
+          const isValidPassword = await comparePasswords(password, user.password);
+          if (!isValidPassword) {
+            return done(null, false, { message: "Invalid email or password" });
+          }
 
-        return done(null, user);
-      } catch (error) {
-        return done(error);
+          return done(null, user);
+        } catch (error) {
+          return done(error);
+        }
       }
-    })
+    )
   );
 
   passport.serializeUser((user, done) => {
@@ -88,16 +94,16 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res) => {
     try {
-      if (!req.body.username || !req.body.password) {
+      if (!req.body.email || !req.body.password || !req.body.firstName) {
         return res.status(400).json({
-          error: "Username and password are required"
+          error: "Email, password and first name are required"
         });
       }
 
-      const existingUser = await storage.getUserByUsername(req.body.username);
+      const existingUser = await storage.getUserByEmail(req.body.email);
       if (existingUser) {
         return res.status(400).json({
-          error: "Username already exists"
+          error: "Email already exists"
         });
       }
 
@@ -122,7 +128,7 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
       if (err) {
         return res.status(500).json({
           error: "Login failed. Please try again."
@@ -131,7 +137,7 @@ export function setupAuth(app: Express) {
 
       if (!user) {
         return res.status(401).json({
-          error: info?.message || "Invalid username or password"
+          error: info?.message || "Invalid email or password"
         });
       }
 

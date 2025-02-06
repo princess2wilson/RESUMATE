@@ -10,7 +10,7 @@ const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
 
   createCVReview(review: Omit<CVReview, "id">): Promise<CVReview>;
@@ -19,7 +19,6 @@ export interface IStorage {
   updateCVReview(id: number, feedback: string): Promise<CVReview>;
 
   sessionStore: session.Store;
-  getUserByLinkedinId(linkedinId: string): Promise<User | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -37,11 +36,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByEmail(email: string): Promise<User | undefined> {
     const [user] = await db
       .select()
       .from(schema.users)
-      .where(eq(schema.users.username, username));
+      .where(eq(schema.users.email, email));
     return user;
   }
 
@@ -82,16 +81,6 @@ export class DatabaseStorage implements IStorage {
       .where(eq(schema.cvReviews.id, id))
       .returning();
     return updated;
-  }
-
-  async getUserByLinkedinId(linkedinId: string): Promise<User | undefined> {
-    console.log("Looking up user by LinkedIn ID:", linkedinId);
-    const [user] = await db
-      .select()
-      .from(schema.users)
-      .where(eq(schema.users.linkedinId, linkedinId));
-    console.log("LinkedIn user lookup result:", user ? "Found" : "Not found");
-    return user;
   }
 }
 
