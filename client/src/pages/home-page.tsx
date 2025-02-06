@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { formatPrice, calculateDiscountedPrice } from "@/lib/currency";
+
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -212,6 +214,14 @@ export default function HomePage() {
                       48-hour turnaround
                     </li>
                   </ul>
+                  <div className="mt-4 mb-6">
+                    <span className="text-2xl font-bold">
+                      {formatPrice(calculateDiscountedPrice(9900, 70))}
+                    </span>
+                    <span className="text-sm text-muted-foreground line-through ml-2">
+                      {formatPrice(9900)}
+                    </span>
+                  </div>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced mt-auto" asChild>
                     <Link href="/cv-submission">GET REVIEW</Link>
                   </Button>

@@ -3,8 +3,12 @@ import { ConsultationForm } from "@/components/consultation-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Calendar, Video, Users } from "lucide-react";
+import { formatPrice, calculateDiscountedPrice } from "@/lib/currency";
 
 export default function ConsultationPage() {
+  const basePrice = 14900; // £149.00
+  const discountedPrice = calculateDiscountedPrice(basePrice, 50);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Navigation */}
@@ -32,6 +36,15 @@ export default function ConsultationPage() {
               Book a one-on-one session with our career specialists to review your CV, 
               prepare for interviews, and develop your professional growth strategy
             </p>
+            <div className="mt-4">
+              <span className="text-3xl font-bold">{formatPrice(discountedPrice)}</span>
+              <span className="text-lg text-muted-foreground line-through ml-2">
+                {formatPrice(basePrice)}
+              </span>
+              <span className="text-sm text-muted-foreground ml-2">
+                (Save 50%)
+              </span>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-5 gap-8">

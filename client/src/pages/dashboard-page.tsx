@@ -19,6 +19,7 @@ import { useState } from "react";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
+import { formatPrice } from "@/lib/currency";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -210,7 +211,7 @@ export default function DashboardPage() {
                     </p>
                     <div className="flex justify-between items-center">
                       <span className="text-2xl font-bold">
-                        ${(product.price / 100).toFixed(2)}
+                        {formatPrice(product.price)}
                       </span>
                       <Button>
                         Buy Now

@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import type { Product } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
+import { formatPrice, calculateDiscountedPrice } from "@/lib/currency";
 
 const resourceIcons = {
   cv_template: FileText,
@@ -73,15 +74,8 @@ const itemVariants = {
   },
 };
 
-const formatPrice = (amount: number) => {
-  return `$${(amount / 100).toFixed(2)}`;
-};
 
-const calculateDiscountedPrice = (price: number) => {
-  return Math.floor(price * 0.5); // 50% off
-};
-
-export default function ResourceLibraryPage() {
+const ResourceLibraryPage = () => {
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const { user } = useAuth();
@@ -191,6 +185,9 @@ export default function ResourceLibraryPage() {
                     <div className="mt-auto">
                       <div className="mb-4">
                         <span className="text-2xl font-bold">{formatPrice(discountedPrice)}</span>
+                        <span className="text-sm text-muted-foreground line-through ml-2">
+                          {formatPrice(product.price)}
+                        </span>
                       </div>
                       <Button
                         className="w-full group"
@@ -248,6 +245,9 @@ export default function ResourceLibraryPage() {
                   <div className="text-3xl font-bold mb-1">
                     {selectedProduct && formatPrice(selectedProduct.price)}
                   </div>
+                  <div className="text-sm text-muted-foreground line-through">
+                    {selectedProduct && formatPrice(selectedProduct.price * 2)}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     Limited time offer
                   </div>
@@ -275,4 +275,6 @@ export default function ResourceLibraryPage() {
       </main>
     </div>
   );
-}
+};
+
+export default ResourceLibraryPage;
