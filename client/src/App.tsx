@@ -1,5 +1,13 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/home-page';
+import AuthPage from './pages/auth-page';
+import DashboardPage from './pages/dashboard-page';
+import AdminPage from './pages/admin-page';
+import ResourceLibraryPage from './pages/resource-library-page';
+import NotFoundPage from './pages/not-found';
+import { PrivateRoute } from './lib/protected-route';
 import {
   useQuery,
   useMutation,
@@ -134,7 +142,16 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        {/* Your app content */}
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/dashboard" element={<PrivateRoute element={<DashboardPage />} />} />
+            <Route path="/admin" element={<PrivateRoute element={<AdminPage />} />} />
+            <Route path="/resources" element={<ResourceLibraryPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
   );
