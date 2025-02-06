@@ -65,13 +65,9 @@ export default function ResourceLibraryPage() {
               </span>
             </Link>
             <div className="space-x-4">
-              {user ? (
+              {user && (
                 <Button variant="outline" asChild>
                   <Link href="/dashboard">DASHBOARD</Link>
-                </Button>
-              ) : (
-                <Button className="bg-primary hover:bg-primary/90" asChild>
-                  <Link href="/auth">SIGN IN</Link>
                 </Button>
               )}
             </div>
@@ -168,13 +164,11 @@ export default function ResourceLibraryPage() {
                 <Button
                   className="w-full bg-primary hover:bg-primary/90"
                   onClick={() => {
-                    if (!user) {
-                      window.location.href = '/auth';
-                    }
-                    // Add purchase logic here when user is logged in
+                    // Add purchase logic here
+                    // This would typically involve redirecting to a payment gateway
                   }}
                 >
-                  {user ? 'BUY NOW' : 'LOGIN TO PURCHASE'}
+                  BUY NOW
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
