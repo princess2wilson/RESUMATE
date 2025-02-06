@@ -105,13 +105,20 @@ export function setupAuth(app: Express) {
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
         callbackURL: "https://workspace.princess2wilson.repl.co/api/auth/linkedin/callback",
         scope: ["r_emailaddress", "r_liteprofile"],
+        state: true, // Enable state parameter for security
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
+          console.log("LinkedIn auth callback received", { profileId: profile.id });
           let user = await storage.getUserByLinkedinId(profile.id);
 
           if (!user) {
             // Create new user if doesn't exist
+            console.log("Creating new user for LinkedIn profile", { 
+              email: profile.emails?.[0]?.value,
+              id: profile.id 
+            });
+
             user = await storage.createUser({
               username: profile.emails?.[0]?.value || `linkedin_${profile.id}`,
               password: await hashPassword(randomBytes(32).toString("hex")),
@@ -122,6 +129,7 @@ export function setupAuth(app: Express) {
 
           return done(null, user);
         } catch (error) {
+          console.error("LinkedIn authentication error:", error);
           return done(error);
         }
       }
@@ -219,14 +227,34 @@ export function setupAuth(app: Express) {
   // LinkedIn auth routes
   app.get(
     "/api/auth/linkedin",
-    passport.authenticate("linkedin")
+    (req, res, next) => {
+      console.log("Starting LinkedIn authentication");
+      passport.authenticate("linkedin")(req, res, next);
+    }
   );
 
   app.get(
     "/api/auth/linkedin/callback",
-    passport.authenticate("linkedin", { failureRedirect: "/auth" }),
-    (req, res) => {
-      res.redirect("/dashboard");
+    (req, res, next) => {
+      passport.authenticate("linkedin", (err, user, info) => {
+        if (err) {
+          console.error("LinkedIn callback error:", err);
+          return res.redirect('/auth?error=linkedin_auth_failed');
+        }
+
+        if (!user) {
+          console.error("LinkedIn auth: No user returned");
+          return res.redirect('/auth?error=linkedin_auth_failed');
+        }
+
+        req.login(user, (loginErr) => {
+          if (loginErr) {
+            console.error("Login error after LinkedIn auth:", loginErr);
+            return res.redirect('/auth?error=login_failed');
+          }
+          return res.redirect('/dashboard');
+        });
+      })(req, res, next);
     }
   );
 
