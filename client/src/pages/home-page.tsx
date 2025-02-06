@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+// ... (keep existing animations and constants)
+
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -39,7 +41,6 @@ export default function HomePage() {
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send this to your backend
     toast({
       title: "Success!",
       description: "Your career guide is on its way to your inbox!",
@@ -80,7 +81,7 @@ export default function HomePage() {
                 </div>
               ) : (
                 <Button className="bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                  <Link href="/auth">GET STARTED</Link>
+                  <Link href="/cv-submission">SUBMIT YOUR CV FOR REVIEW</Link>
                 </Button>
               )}
             </div>
@@ -142,13 +143,37 @@ export default function HomePage() {
                   asChild
                   className="w-full sm:w-auto uppercase-spaced"
                 >
-                  <Link href="/auth">
-                    START NOW
+                  <Link href="/cv-submission">
+                    SUBMIT CV FOR REVIEW
                   </Link>
                 </Button>
               </motion.div>
             </motion.div>
           </div>
+        </div>
+      </motion.section>
+
+      {/* Promotional Section */}
+      <motion.section
+        className="py-12 bg-primary/5"
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true }}
+        variants={staggerChildren}
+      >
+        <div className="container mx-auto px-4">
+          <motion.div
+            className="max-w-4xl mx-auto text-center"
+            variants={fadeIn}
+          >
+            <h2 className="text-3xl font-serif font-bold mb-4">🎉 Limited Time Offer!</h2>
+            <p className="text-xl mb-2">
+              Get your CV reviewed with <span className="font-bold text-primary">70% OFF</span>
+            </p>
+            <p className="text-muted-foreground">
+              Only available for the first 10 submissions - Don't miss out!
+            </p>
+          </motion.div>
         </div>
       </motion.section>
 
@@ -244,7 +269,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href="/resources">GET REVIEW</Link>
+                    <Link href="/cv-submission">GET REVIEW</Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -282,7 +307,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href="/resources">ACCESS LIBRARY</Link>
+                    <Link href="/cv-submission">ACCESS LIBRARY</Link>
                   </Button>
                 </CardContent>
               </Card>
