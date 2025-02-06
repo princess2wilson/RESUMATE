@@ -23,15 +23,20 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   price: integer("price").notNull(),
-  type: text("type").notNull(), // 'cv_template', 'cover_letter', 'guide'
+  type: text("type").notNull(), // 'cv_template', 'interview_guide', etc.
+  stripeProductId: text("stripe_product_id"),
+  stripePriceId: text("stripe_price_id"),
 });
 
 export const consultations = pgTable("consultations", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: integer("user_id"),  // Made optional for guest bookings
+  name: text("name").notNull(),
+  email: text("email").notNull(),
   date: text("date").notNull(),
   time: text("time").notNull(),
   status: text("status").notNull().default("pending"),
+  meetLink: text("meet_link"),
 });
 
 export const subscriptions = pgTable("subscriptions", {
@@ -54,6 +59,8 @@ export const insertCVReviewSchema = createInsertSchema(cvReviews).pick({
 });
 
 export const insertConsultationSchema = createInsertSchema(consultations).pick({
+  name: true,
+  email: true,
   date: true,
   time: true,
 });

@@ -21,12 +21,12 @@ export interface IStorage {
 
   getProducts(): Promise<Product[]>;
   getProduct(id: number): Promise<Product | undefined>;
+  updateProduct(id: number, update: Partial<Product>): Promise<Product>;
 
   createConsultation(consultation: Omit<Consultation, "id">): Promise<Consultation>;
   getConsultations(userId: number): Promise<Consultation[]>;
 
   sessionStore: session.Store;
-
   // Add new subscription methods
   createSubscription(subscription: Omit<Subscription, "id">): Promise<Subscription>;
   getSubscription(userId: number): Promise<Subscription | undefined>;
@@ -130,6 +130,15 @@ export class DatabaseStorage implements IStorage {
       .from(schema.products)
       .where(eq(schema.products.id, id));
     return product;
+  }
+
+  async updateProduct(id: number, update: Partial<Product>): Promise<Product> {
+    const [updated] = await db
+      .update(schema.products)
+      .set(update)
+      .where(eq(schema.products.id, id))
+      .returning();
+    return updated;
   }
 
   async createConsultation(consultation: Omit<Consultation, "id">): Promise<Consultation> {

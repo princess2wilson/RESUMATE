@@ -17,16 +17,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-10-16",
 });
 
-const PRICE_IDS = {
-  starter: "price_starter", // Replace with actual Stripe price IDs
-  pro: "price_pro",
-  enterprise: "price_enterprise",
-};
-
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
-  // CV Review routes
+  // CV Review routes (require authentication)
   app.post("/api/cv-review", upload.single("file"), async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     if (!req.file) return res.status(400).send("No file uploaded");
@@ -39,6 +33,108 @@ export function registerRoutes(app: Express): Server {
       createdAt: new Date().toISOString(),
     });
     res.json(review);
+  });
+
+  // Consultation routes (no auth required)
+  app.post("/api/consultations", async (req, res) => {
+    try {
+      const parsedData = insertConsultationSchema.parse(req.body);
+
+      // Create calendar event
+      const calendarEvent = await createConsultationEvent({
+        date: parsedData.date,
+        time: parsedData.time,
+        email: parsedData.email,
+        name: parsedData.name,
+      });
+
+      const consultation = await storage.createConsultation({
+        ...parsedData,
+        status: "confirmed",
+        meetLink: calendarEvent.meetLink,
+      });
+
+      res.json({ 
+        ...consultation,
+        meetLink: calendarEvent.meetLink 
+      });
+    } catch (error) {
+      console.error('Error booking consultation:', error);
+      res.status(500).json({ 
+        error: 'Failed to book consultation',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Product routes (no auth required)
+  app.get("/api/products", async (_req, res) => {
+    try {
+      const products = await storage.getProducts();
+      res.json(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Failed to fetch products' });
+    }
+  });
+
+  // Stripe checkout (no auth required)
+  app.post("/api/create-checkout-session", async (req, res) => {
+    try {
+      const { productId } = req.body;
+      const product = await storage.getProduct(productId);
+
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+
+      // Create Stripe Product if it doesn't exist
+      let stripeProduct = product.stripeProductId;
+      let stripePrice = product.stripePriceId;
+
+      if (!stripeProduct || !stripePrice) {
+        const newStripeProduct = await stripe.products.create({
+          name: product.name,
+          description: product.description,
+        });
+
+        const newStripePrice = await stripe.prices.create({
+          product: newStripeProduct.id,
+          unit_amount: product.price,
+          currency: 'usd',
+        });
+
+        // Update product with Stripe IDs
+        await storage.updateProduct(product.id, {
+          stripeProductId: newStripeProduct.id,
+          stripePriceId: newStripePrice.id,
+        });
+
+        stripeProduct = newStripeProduct.id;
+        stripePrice = newStripePrice.id;
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: stripePrice,
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${req.protocol}://${req.get("host")}/resources?success=true`,
+        cancel_url: `${req.protocol}://${req.get("host")}/resources?canceled=true`,
+      });
+
+      res.json({ url: session.url });
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      res.status(500).json({ 
+        error: 'Failed to create checkout session',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
   });
 
   app.get("/api/cv-reviews", async (req, res) => {
@@ -62,87 +158,11 @@ export function registerRoutes(app: Express): Server {
     res.json(review);
   });
 
-  // Product routes
-  app.get("/api/products", async (_req, res) => {
-    const products = await storage.getProducts();
-    res.json(products);
-  });
-
-  // Consultation routes
-  app.post("/api/consultations", async (req, res) => {
-    try {
-      const parsedData = insertConsultationSchema.parse(req.body);
-
-      // Create calendar event
-      const calendarEvent = await createConsultationEvent({
-        date: parsedData.date,
-        time: parsedData.time,
-        email: req.body.email,
-        name: req.body.name,
-      });
-
-      const consultation = await storage.createConsultation({
-        ...parsedData,
-        userId: req.user?.id,  // Make userId optional
-        status: "confirmed",
-        meetLink: calendarEvent.meetLink,
-      });
-
-      res.json({ 
-        ...consultation,
-        meetLink: calendarEvent.meetLink 
-      });
-    } catch (error) {
-      console.error('Error booking consultation:', error);
-      res.status(500).json({ error: 'Failed to book consultation' });
-    }
-  });
 
   app.get("/api/consultations", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const consultations = await storage.getConsultations(req.user.id);
     res.json(consultations);
-  });
-
-  // Subscription routes
-  app.post("/api/create-checkout-session", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    const { priceId, planType } = req.body;
-
-    // Create or retrieve the customer
-    let customer;
-    const existingCustomer = await storage.getStripeCustomer(req.user.id);
-
-    if (existingCustomer) {
-      customer = existingCustomer;
-    } else {
-      customer = await stripe.customers.create({
-        metadata: {
-          userId: req.user.id.toString(),
-        },
-      });
-      await storage.setStripeCustomer(req.user.id, customer.id);
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      customer: customer.id,
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: "subscription",
-      success_url: `${req.protocol}://${req.get("host")}/dashboard?success=true`,
-      cancel_url: `${req.protocol}://${req.get("host")}/?canceled=true`,
-      metadata: {
-        userId: req.user.id.toString(),
-        planType,
-      },
-    });
-
-    res.json({ url: session.url });
   });
 
   app.post("/api/webhooks", async (req, res) => {

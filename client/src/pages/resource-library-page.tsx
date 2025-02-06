@@ -76,7 +76,6 @@ const itemVariants = {
 };
 
 export default function ResourceLibraryPage() {
-  const { user } = useAuth();
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
@@ -95,12 +94,17 @@ export default function ResourceLibraryPage() {
   const handlePurchase = async (product: Product) => {
     try {
       const response = await apiRequest("POST", "/api/create-checkout-session", {
-        priceId: `price_${product.id}`, // Your actual Stripe price ID
-        planType: product.type,
+        productId: product.id,
       });
+
       const { url } = await response.json();
-      window.location.href = url;
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error("No checkout URL received");
+      }
     } catch (error) {
+      console.error('Purchase error:', error);
       toast({
         title: "Purchase failed",
         description: "There was an error processing your purchase. Please try again.",
@@ -143,11 +147,11 @@ export default function ResourceLibraryPage() {
               </span>
             </Link>
             <div className="space-x-4">
-              {user && (
+              {/*user && (
                 <Button variant="outline" asChild>
                   <Link href="/dashboard">DASHBOARD</Link>
                 </Button>
-              )}
+              )*/}
             </div>
           </div>
         </div>
