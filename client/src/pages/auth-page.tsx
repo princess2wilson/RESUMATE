@@ -29,11 +29,10 @@ export default function AuthPage() {
   const form = useForm<InsertUser>({
     resolver: zodResolver(
       activeTab === "login"
-        ? insertUserSchema.pick({ username: true, password: true })
+        ? insertUserSchema.pick({ email: true, password: true })
         : insertUserSchema
     ),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       firstName: "",
@@ -55,10 +54,10 @@ export default function AuthPage() {
       }
     } catch (err) {
       if (err instanceof Error) {
-        if (err.message.includes("Invalid username or password")) {
-          setError("The username or password you entered is incorrect. Please try again.");
-        } else if (err.message.includes("Username already exists")) {
-          setError("This username is already taken. Please choose a different one.");
+        if (err.message.includes("Invalid email or password")) {
+          setError("The email or password you entered is incorrect. Please try again.");
+        } else if (err.message.includes("Email already exists")) {
+          setError("This email is already taken. Please use a different one.");
         } else {
           setError("Something went wrong. Please try again later.");
         }
@@ -112,6 +111,19 @@ export default function AuthPage() {
                 {activeTab === "register" && (
                   <div className="mb-6 text-sm bg-primary/5 border border-primary/10 p-4 rounded-lg">
                     <p className="flex items-start gap-2">
+                      <span className="mt-0.5">🔒</span>
+                      <span>
+                        Don't worry! We only need these details to create your secure portal for CV reviews. 
+                        <span className="block mt-1 text-muted-foreground">
+                          No spam emails, no newsletters - just a safe space for your career growth journey! <span className="ml-1">✨</span>
+                        </span>
+                      </span>
+                    </p>
+                  </div>
+                )}
+                {activeTab === "register" && (
+                  <div className="mb-6 text-sm bg-primary/5 border border-primary/10 p-4 rounded-lg">
+                    <p className="flex items-start gap-2">
                       <Heart className="w-4 h-4 mt-0.5 text-primary" />
                       <span>
                         Join our community of professionals improving their career prospects.
@@ -126,56 +138,36 @@ export default function AuthPage() {
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     {activeTab === "register" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="firstName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <Label>Tell us your name</Label>
-                              <FormControl>
-                                <Input
-                                  placeholder="Enter your first name"
-                                  {...field}
-                                  disabled={registerMutation.isPending}
-                                  className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <Label>Email address</Label>
-                              <FormControl>
-                                <Input
-                                  type="email"
-                                  placeholder="you@example.com"
-                                  {...field}
-                                  disabled={registerMutation.isPending}
-                                  className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
+                      <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label>What can we call you?</Label>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter your first name"
+                                {...field}
+                                disabled={registerMutation.isPending}
+                                className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     )}
 
                     <FormField
                       control={form.control}
-                      name="username"
+                      name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <Label>Username</Label>
+                          <Label>Email address</Label>
                           <FormControl>
                             <Input
-                              placeholder="Choose a username"
+                              type="email"
+                              placeholder="you@example.com"
                               {...field}
                               disabled={loginMutation.isPending || registerMutation.isPending}
                               className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
