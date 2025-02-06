@@ -103,6 +103,13 @@ export default function AuthPage() {
                   </Alert>
                 )}
 
+                {activeTab === "register" && (
+                  <div className="mb-6 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+                    <p>🔒 Don't worry! We only need these details to create your secure portal for CV reviews. 
+                    No spam emails, no newsletters - just a safe space for your career growth journey! ✨</p>
+                  </div>
+                )}
+
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     <FormField
