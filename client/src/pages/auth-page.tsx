@@ -132,10 +132,10 @@ export default function AuthPage() {
                           name="firstName"
                           render={({ field }) => (
                             <FormItem>
-                              <Label>What should we call you?</Label>
+                              <Label>Tell us your name</Label>
                               <FormControl>
-                                <Input 
-                                  placeholder="Your first name"
+                                <Input
+                                  placeholder="Enter your first name"
                                   {...field}
                                   disabled={registerMutation.isPending}
                                   className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
@@ -152,7 +152,7 @@ export default function AuthPage() {
                             <FormItem>
                               <Label>Email address</Label>
                               <FormControl>
-                                <Input 
+                                <Input
                                   type="email"
                                   placeholder="you@example.com"
                                   {...field}
@@ -174,7 +174,7 @@ export default function AuthPage() {
                         <FormItem>
                           <Label>Username</Label>
                           <FormControl>
-                            <Input 
+                            <Input
                               placeholder="Choose a username"
                               {...field}
                               disabled={loginMutation.isPending || registerMutation.isPending}
@@ -193,7 +193,7 @@ export default function AuthPage() {
                         <FormItem>
                           <Label>Password</Label>
                           <FormControl>
-                            <Input 
+                            <Input
                               type="password"
                               placeholder={activeTab === "register" ? "Create a secure password" : "Enter your password"}
                               {...field}
@@ -235,8 +235,8 @@ export default function AuthPage() {
                   Expert CV Review Service
                 </h1>
                 <p className="text-primary-foreground/90 text-sm leading-relaxed">
-                  Get personalized feedback on your CV from industry experts. Our professional 
-                  reviewers will help you stand out to employers and increase your chances of 
+                  Get personalized feedback on your CV from industry experts. Our professional
+                  reviewers will help you stand out to employers and increase your chances of
                   landing your dream job.
                 </p>
               </div>
