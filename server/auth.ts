@@ -105,40 +105,42 @@ export function setupAuth(app: Express) {
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
         callbackURL: `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/linkedin/callback`,
         scope: ["r_emailaddress", "r_liteprofile"],
-        state: true,
       },
-      async (req, accessToken, refreshToken, profile, done) => {
+      async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log("LinkedIn auth callback received", { 
+          console.log("LinkedIn OAuth Callback - Start", {
             profileId: profile.id,
-            emails: profile.emails,
-            displayName: profile.displayName
+            email: profile.emails?.[0]?.value,
+            name: profile.displayName
           });
 
           let user = await storage.getUserByLinkedinId(profile.id);
+          console.log("Existing user lookup result:", user ? "Found" : "Not found");
 
           if (!user) {
-            console.log("Creating new user for LinkedIn profile", { 
-              email: profile.emails?.[0]?.value,
-              id: profile.id,
-              displayName: profile.displayName
-            });
-
+            console.log("Creating new user for LinkedIn profile");
             const username = profile.emails?.[0]?.value || 
                            profile.displayName?.replace(/\s+/g, '_').toLowerCase() || 
                            `linkedin_${profile.id}`;
 
-            user = await storage.createUser({
-              username,
-              password: await hashPassword(randomBytes(32).toString("hex")),
-              linkedinId: profile.id,
-              email: profile.emails?.[0]?.value,
-            });
+            try {
+              user = await storage.createUser({
+                username,
+                password: await hashPassword(randomBytes(32).toString("hex")),
+                linkedinId: profile.id,
+                email: profile.emails?.[0]?.value,
+              });
+              console.log("New user created successfully");
+            } catch (createError) {
+              console.error("Error creating new user:", createError);
+              return done(createError);
+            }
           }
 
+          console.log("LinkedIn OAuth Callback - Success");
           return done(null, user);
         } catch (error) {
-          console.error("LinkedIn authentication error:", error);
+          console.error("LinkedIn OAuth Callback - Error:", error);
           return done(error);
         }
       }
@@ -238,16 +240,15 @@ export function setupAuth(app: Express) {
     "/api/auth/linkedin",
     (req, res, next) => {
       console.log("Starting LinkedIn authentication");
-      passport.authenticate("linkedin", {
-        state: true,
-        scope: ["r_emailaddress", "r_liteprofile"]
-      })(req, res, next);
+      passport.authenticate("linkedin")(req, res, next);
     }
   );
 
   app.get(
     "/api/auth/linkedin/callback",
     (req, res, next) => {
+      console.log("LinkedIn callback received", { query: req.query });
+
       passport.authenticate("linkedin", (err, user, info) => {
         if (err) {
           console.error("LinkedIn callback error:", err);
