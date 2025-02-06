@@ -27,9 +27,10 @@ export default function ConsultationPage() {
           className="max-w-5xl mx-auto"
         >
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-serif font-bold mb-4">Book Your Consultation</h1>
+            <h1 className="text-4xl font-serif font-bold mb-4">Expert Career Consultation</h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Schedule a one-on-one session with our career experts to discuss your professional growth
+              Book a one-on-one session with our career specialists to review your CV, 
+              prepare for interviews, and develop your professional growth strategy
             </p>
           </div>
 
@@ -57,9 +58,9 @@ export default function ConsultationPage() {
                         <Video className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-1">Virtual Sessions</h3>
+                        <h3 className="font-semibold mb-1">Personalized 1:1 Sessions</h3>
                         <p className="text-sm text-muted-foreground">
-                          Meet via video conference from anywhere in the world
+                          In-depth video consultations focused on your specific career goals and challenges
                         </p>
                       </div>
                     </div>
@@ -79,9 +80,9 @@ export default function ConsultationPage() {
                         <Calendar className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-1">Instant Confirmation</h3>
+                        <h3 className="font-semibold mb-1">Flexible Scheduling</h3>
                         <p className="text-sm text-muted-foreground">
-                          Receive immediate calendar invites and meeting details
+                          Choose from available time slots that fit your schedule, with instant confirmation
                         </p>
                       </div>
                     </div>
@@ -101,9 +102,9 @@ export default function ConsultationPage() {
                         <Users className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold mb-1">Expert Guidance</h3>
+                        <h3 className="font-semibold mb-1">Industry Expertise</h3>
                         <p className="text-sm text-muted-foreground">
-                          One-on-one sessions with experienced career professionals
+                          Gain insights from experienced professionals who understand your industry's requirements
                         </p>
                       </div>
                     </div>
