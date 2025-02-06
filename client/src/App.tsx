@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/home-page';
@@ -12,7 +11,6 @@ import {
   useQuery,
   useMutation,
   UseMutationResult,
-  QueryClientProvider,
 } from "@tanstack/react-query";
 import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "@/lib/queryClient";
@@ -34,7 +32,7 @@ type LoginData = Pick<InsertUser, "username" | "password">;
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
   const {
@@ -47,6 +45,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   });
 
   useEffect(() => {
+    // Check authentication status (e.g., from local storage or API)
     const authStatus = localStorage.getItem('isAuthenticated') === 'true';
     setIsAuthenticated(authStatus);
   }, []);
