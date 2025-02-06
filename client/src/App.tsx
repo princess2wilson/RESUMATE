@@ -9,6 +9,7 @@ import HomePage from "@/pages/home-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AdminPage from "@/pages/admin-page";
 import ResourceLibraryPage from "@/pages/resource-library-page";
+import ConsultationPage from "@/pages/consultation-page";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -19,6 +20,7 @@ function Router() {
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
       <ProtectedRoute path="/admin" component={AdminPage} />
       <Route path="/resources" component={ResourceLibraryPage} />
+      <Route path="/consultations" component={ConsultationPage} />
       <Route component={NotFound} />
     </Switch>
   );
