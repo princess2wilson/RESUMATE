@@ -7,8 +7,7 @@ import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-
-// ... (keep existing animations and constants)
+import { Badge } from "@/components/ui/badge";
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -89,7 +88,7 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - Updated with Digital Library Promotion */}
       <motion.section
         className="relative min-h-screen flex items-center pt-16"
         initial="initial"
@@ -103,13 +102,18 @@ export default function HomePage() {
               variants={fadeIn}
             >
               <div className="space-y-6">
-                <motion.p
-                  className="uppercase-spaced text-primary flex items-center justify-center gap-2"
+                <motion.div
+                  className="flex items-center justify-center gap-2"
                   variants={slideIn}
                 >
-                  <Sparkles className="w-5 h-5" />
-                  TRANSFORM YOUR CAREER TODAY
-                </motion.p>
+                  <p className="uppercase-spaced text-primary">
+                    TRANSFORM YOUR CAREER TODAY
+                  </p>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    <Sparkles className="w-4 h-4 mr-1" />
+                    50% OFF ALL RESOURCES
+                  </Badge>
+                </motion.div>
                 <motion.h1
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
@@ -143,8 +147,9 @@ export default function HomePage() {
                   asChild
                   className="w-full sm:w-auto uppercase-spaced"
                 >
-                  <Link href="/cv-submission">
-                    SUBMIT CV FOR REVIEW
+                  <Link href="/resources">
+                    VIEW DIGITAL LIBRARY
+                    <Sparkles className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
               </motion.div>
@@ -213,7 +218,7 @@ export default function HomePage() {
         </div>
       </motion.section>
 
-      {/* Services Section */}
+      {/* Services Section - Updated Digital Resources Card */}
       <motion.section
         id="services"
         className="py-24 bg-gray-50"
@@ -273,13 +278,19 @@ export default function HomePage() {
               </Card>
             </motion.div>
 
-            {/* Digital Resources */}
+            {/* Digital Resources - Updated with promotion */}
             <motion.div
               variants={fadeIn}
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
               <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300">
+                <div className="absolute top-4 right-4">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    <Sparkles className="w-4 h-4 mr-1" />
+                    50% OFF
+                  </Badge>
+                </div>
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <BookOpen className="w-6 h-6 text-primary" />
@@ -303,7 +314,10 @@ export default function HomePage() {
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced" asChild>
-                    <Link href="/resources">ACCESS LIBRARY</Link>
+                    <Link href="/resources">
+                      ACCESS LIBRARY
+                      <Sparkles className="w-4 h-4 ml-2" />
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>

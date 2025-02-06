@@ -39,8 +39,10 @@ import {
   GraduationCap,
   BrainCircuit,
   CreditCard,
+  Sparkles,
 } from "lucide-react";
 import type { Product } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
 
 const resourceIcons = {
   cv_template: FileText,
@@ -111,6 +113,10 @@ export default function ResourceLibraryPage() {
     }
   };
 
+  const calculateDiscountedPrice = (price: number) => {
+    return Math.floor(price * 0.5); // 50% off
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
       <Particles
@@ -153,7 +159,13 @@ export default function ResourceLibraryPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-serif font-bold mb-4">Digital Resource Library</h1>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <h1 className="text-4xl font-serif font-bold">Digital Resource Library</h1>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              <Sparkles className="w-4 h-4 mr-1" />
+              50% OFF
+            </Badge>
+          </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Access premium templates, guides, and tools to accelerate your career growth
           </p>
@@ -167,6 +179,9 @@ export default function ResourceLibraryPage() {
         >
           {products?.map((product) => {
             const Icon = resourceIcons[product.type as ResourceType] || FileText;
+            const originalPrice = product.price;
+            const discountedPrice = calculateDiscountedPrice(originalPrice);
+
             return (
               <motion.div
                 key={product.id}
@@ -187,7 +202,7 @@ export default function ResourceLibraryPage() {
                   <CardFooter className="mt-auto pt-6">
                     <Button
                       className="w-full group"
-                      onClick={() => setSelectedProduct(product)}
+                      onClick={() => setSelectedProduct({...product, price: discountedPrice})}
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
                         VIEW DETAILS
@@ -237,11 +252,15 @@ export default function ResourceLibraryPage() {
 
               <div className="space-y-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">
-                    ${(selectedProduct?.price || 0) / 100}
+                  <div className="inline-flex items-center gap-2">
+                    <div className="text-3xl font-bold">${(selectedProduct?.price || 0) / 100}</div>
+                    <Badge variant="secondary" className="bg-primary/10 text-primary">
+                      <Sparkles className="w-4 h-4 mr-1" />
+                      50% OFF
+                    </Badge>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    One-time purchase
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Limited time offer
                   </div>
                   <div className="flex justify-center gap-2 mt-2">
                     <SiVisa className="w-8 h-8 text-gray-400" />
