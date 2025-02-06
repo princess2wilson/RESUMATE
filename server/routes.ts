@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import multer from "multer";
 import { insertCVReviewSchema, insertConsultationSchema } from "@shared/schema";
 import Stripe from "stripe";
+import { createConsultationEvent } from './services/calendar';
 
 const upload = multer({ dest: "uploads/" });
 
@@ -69,15 +70,32 @@ export function registerRoutes(app: Express): Server {
 
   // Consultation routes
   app.post("/api/consultations", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    try {
+      const parsedData = insertConsultationSchema.parse(req.body);
 
-    const parsedData = insertConsultationSchema.parse(req.body);
-    const consultation = await storage.createConsultation({
-      ...parsedData,
-      userId: req.user.id,
-      status: "pending",
-    });
-    res.json(consultation);
+      // Create calendar event
+      const calendarEvent = await createConsultationEvent({
+        date: parsedData.date,
+        time: parsedData.time,
+        email: req.body.email,
+        name: req.body.name,
+      });
+
+      const consultation = await storage.createConsultation({
+        ...parsedData,
+        userId: req.user?.id,  // Make userId optional
+        status: "confirmed",
+        meetLink: calendarEvent.meetLink,
+      });
+
+      res.json({ 
+        ...consultation,
+        meetLink: calendarEvent.meetLink 
+      });
+    } catch (error) {
+      console.error('Error booking consultation:', error);
+      res.status(500).json({ error: 'Failed to book consultation' });
+    }
   });
 
   app.get("/api/consultations", async (req, res) => {

@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 import {
   Dialog,
@@ -19,6 +19,17 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import { motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import Particles from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim";
+import { Engine } from "@tsparticles/engine";
+import {
+  SiMastercard,
+  SiVisa,
+  SiAmericanexpress,
+  SiPaypal,
+} from "react-icons/si";
 import {
   FileText,
   BookOpen,
@@ -27,6 +38,7 @@ import {
   ArrowRight,
   GraduationCap,
   BrainCircuit,
+  CreditCard,
 } from "lucide-react";
 import type { Product } from "@shared/schema";
 
@@ -41,8 +53,31 @@ const resourceIcons = {
 
 type ResourceType = keyof typeof resourceIcons;
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+    }
+  },
+};
+
 export default function ResourceLibraryPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const { data: products } = useQuery<Product[]>({
@@ -53,10 +88,53 @@ export default function ResourceLibraryPage() {
     ? resourceIcons[selectedProduct.type as ResourceType]
     : FileText;
 
+  const initParticles = async (engine: Engine) => {
+    await loadSlim(engine);
+  };
+
+  const handlePurchase = async (product: Product) => {
+    try {
+      const response = await apiRequest("POST", "/api/create-checkout-session", {
+        priceId: `price_${product.id}`, // Your actual Stripe price ID
+        planType: product.type,
+      });
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      toast({
+        title: "Purchase failed",
+        description: "There was an error processing your purchase. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <Particles
+        id="tsparticles"
+        init={initParticles}
+        options={{
+          particles: {
+            color: { value: "#6b7280" },
+            opacity: { value: 0.1 },
+            size: { value: 1 },
+            move: {
+              direction: "none",
+              enable: true,
+              speed: 0.5,
+            },
+            links: {
+              enable: true,
+              opacity: 0.05,
+            },
+          },
+          background: { color: { value: "transparent" } },
+        }}
+      />
+
       {/* Navigation */}
-      <nav className="border-b bg-white">
+      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
             <Link href="/">
@@ -76,27 +154,39 @@ export default function ResourceLibraryPage() {
       </nav>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        <div className="text-center mb-12">
+      <main className="container mx-auto px-4 py-12 relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
           <h1 className="text-4xl font-serif font-bold mb-4">Digital Resource Library</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Access premium templates, guides, and tools to accelerate your career growth
           </p>
-        </div>
+        </motion.div>
 
         {/* Resource Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {products?.map((product) => {
             const Icon = resourceIcons[product.type as ResourceType] || FileText;
             return (
               <motion.div
                 key={product.id}
-                whileHover={{ y: -5 }}
-                transition={{ duration: 0.3 }}
+                variants={itemVariants}
+                whileHover={{
+                  y: -10,
+                  transition: { type: "spring", stiffness: 300 }
+                }}
               >
-                <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
+                <Card className="h-full flex flex-col group hover:shadow-xl transition-all duration-300 hover:border-primary/20">
                   <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                     <CardTitle>{product.name}</CardTitle>
@@ -104,18 +194,20 @@ export default function ResourceLibraryPage() {
                   </CardHeader>
                   <CardFooter className="mt-auto pt-6">
                     <Button
-                      className="w-full"
+                      className="w-full group"
                       onClick={() => setSelectedProduct(product)}
                     >
-                      VIEW DETAILS
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        VIEW DETAILS
+                      </span>
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                     </Button>
                   </CardFooter>
                 </Card>
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Product Details Dialog */}
         <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
@@ -151,7 +243,7 @@ export default function ResourceLibraryPage() {
                 </ul>
               </div>
 
-              {/* Price and CTA */}
+              {/* Price and Payment */}
               <div className="space-y-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold">
@@ -160,16 +252,22 @@ export default function ResourceLibraryPage() {
                   <div className="text-sm text-muted-foreground">
                     One-time purchase
                   </div>
+                  <div className="flex justify-center gap-2 mt-2">
+                    <SiVisa className="w-8 h-8 text-gray-400" />
+                    <SiMastercard className="w-8 h-8 text-gray-400" />
+                    <SiAmericanexpress className="w-8 h-8 text-gray-400" />
+                    <SiPaypal className="w-8 h-8 text-gray-400" />
+                  </div>
                 </div>
                 <Button
-                  className="w-full bg-primary hover:bg-primary/90"
-                  onClick={() => {
-                    // Add purchase logic here
-                    // This would typically involve redirecting to a payment gateway
-                  }}
+                  className="w-full bg-primary hover:bg-primary/90 group"
+                  onClick={() => selectedProduct && handlePurchase(selectedProduct)}
                 >
-                  BUY NOW
-                  <ArrowRight className="w-4 h-4 ml-2" />
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  <span className="group-hover:translate-x-1 transition-transform duration-300">
+                    BUY NOW
+                  </span>
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
               </div>
             </div>
