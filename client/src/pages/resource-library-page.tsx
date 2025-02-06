@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
@@ -78,14 +78,12 @@ const itemVariants = {
 export default function ResourceLibraryPage() {
   const { toast } = useToast();
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
 
   const { data: products } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
-
-  const IconComponent = selectedProduct
-    ? resourceIcons[selectedProduct.type as ResourceType]
-    : FileText;
 
   const initParticles = async (engine: Engine) => {
     await loadSlim(engine);
@@ -110,6 +108,14 @@ export default function ResourceLibraryPage() {
         description: "There was an error processing your purchase. Please try again.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleCVReview = () => {
+    if (!user) {
+      setLocation('/auth?redirect=/cv-submission');
+    } else {
+      setLocation('/cv-submission');
     }
   };
 

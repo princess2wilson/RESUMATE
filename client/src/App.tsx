@@ -10,6 +10,7 @@ import DashboardPage from "@/pages/dashboard-page";
 import AdminPage from "@/pages/admin-page";
 import ResourceLibraryPage from "@/pages/resource-library-page";
 import ConsultationPage from "@/pages/consultation-page";
+import CVSubmissionPage from "@/pages/cv-submission-page";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <ProtectedRoute path="/admin" component={AdminPage} />
       <Route path="/resources" component={ResourceLibraryPage} />
       <Route path="/consultations" component={ConsultationPage} />
+      <ProtectedRoute path="/cv-submission" component={CVSubmissionPage} />
       <Route component={NotFound} />
     </Switch>
   );
