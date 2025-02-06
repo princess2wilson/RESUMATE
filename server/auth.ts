@@ -79,7 +79,7 @@ export function setupAuth(app: Express) {
       {
         clientID: process.env.GOOGLE_CLIENT_ID!,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        callbackURL: `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co/api/auth/google/callback`,
+        callbackURL: 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev/api/auth/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
@@ -212,6 +212,20 @@ export function setupAuth(app: Express) {
     }
   );
 
+  // Google auth routes
+  app.get(
+    "/api/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+  );
+
+  app.get(
+    "/api/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/auth?error=google_auth_failed" }),
+    (req, res) => {
+      res.redirect("/dashboard");
+    }
+  );
+
   // Session serialization
   passport.serializeUser((user, done) => {
     console.log("Serializing user:", user.id);
@@ -293,21 +307,6 @@ export function setupAuth(app: Express) {
       });
     })(req, res, next);
   });
-
-  // Google auth routes
-  app.get(
-    "/api/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
-  );
-
-  app.get(
-    "/api/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/auth" }),
-    (req, res) => {
-      res.redirect("/dashboard");
-    }
-  );
-
 
   app.post("/api/logout", (req, res) => {
     req.logout((err) => {
