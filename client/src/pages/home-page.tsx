@@ -140,15 +140,14 @@ export default function HomePage() {
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
                 >
-                  Find Your Career
-                  <span className="gradient-text">mate</span>
+                  Every Career Journey Needs
+                  <span className="gradient-text">Guidance, a Mate</span>
                 </motion.h1>
                 <motion.p
                   className="text-xl text-muted-foreground max-w-[800px] mx-auto leading-relaxed"
                   variants={fadeIn}
                 >
-                  Because every great career deserves a perfect match. Let's pair your potential 
-                  with the possibilities that await.
+                  Where career guidance meets genuine support
                 </motion.p>
               </div>
               <motion.div
