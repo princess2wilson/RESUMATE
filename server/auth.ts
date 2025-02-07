@@ -92,6 +92,7 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Authentication routes
   app.post("/api/register", async (req, res) => {
     try {
       if (!req.body.email || !req.body.password || !req.body.firstName) {
