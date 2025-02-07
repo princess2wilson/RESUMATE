@@ -4,7 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { loginLimiter, apiLimiter, auditLogger, securityHeaders } from "./middleware/security";
 
 const app = express();
-app.enable('trust proxy');
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

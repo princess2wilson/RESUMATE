@@ -19,6 +19,7 @@ export const apiLimiter = rateLimit({
   message: { error: 'Too many requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: false
 })
 
 // Audit logging middleware
