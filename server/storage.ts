@@ -1,4 +1,4 @@
-import { User, InsertUser, CVReview } from "@shared/schema";
+import { User, InsertUser, CVReview, AuditLog } from "@shared/schema";
 import session from "express-session";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -16,6 +16,7 @@ export interface IStorage {
   getCVReviews(userId: number): Promise<CVReview[]>;
   getAllCVReviews(): Promise<CVReview[]>;
   updateCVReview(id: number, feedback: string): Promise<CVReview>;
+  createAuditLog(logEntry: Omit<AuditLog, "id">): Promise<void>;
   sessionStore: session.Store;
 }
 
@@ -124,6 +125,15 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error updating CV review:', error);
       throw new Error('Failed to update CV review');
+    }
+  }
+
+  async createAuditLog(logEntry: Omit<AuditLog, "id">): Promise<void> {
+    try {
+      await db.insert(schema.auditLogs).values(logEntry);
+    } catch (error) {
+      console.error('Error creating audit log:', error);
+      // Don't throw error to prevent disrupting the main application flow
     }
   }
 }

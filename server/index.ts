@@ -1,11 +1,25 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { loginLimiter, apiLimiter, auditLogger, securityHeaders } from "./middleware/security";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Apply security headers
+app.use(securityHeaders);
+
+// Apply rate limiting to login route
+app.use("/api/login", loginLimiter);
+
+// Apply general API rate limiting to all other API routes
+app.use("/api", apiLimiter);
+
+// Apply audit logging to all routes
+app.use(auditLogger);
+
+// Logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -39,12 +53,21 @@ app.use((req, res, next) => {
 (async () => {
   const server = registerRoutes(app);
 
+  // Error handling middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
+    // Don't expose stack traces in production
+    const error = {
+      message,
+      ...(process.env.NODE_ENV === 'development' ? { stack: err.stack } : {})
+    };
+
+    res.status(status).json(error);
+    if (status >= 500) {
+      console.error('Server error:', err);
+    }
   });
 
   // importantly only setup vite in development and after
