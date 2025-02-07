@@ -217,10 +217,34 @@ export default function DashboardPage() {
                             <span className="text-muted-foreground">Pending review</span>
                           )}
                         </TableCell>
-                        <TableCell>
-                          <Button onClick={() => setPreviewUrl(review.fileUrl)} variant="link" size="sm">
-                            View CV
+                        <TableCell className="space-x-2">
+                          <Button 
+                            onClick={() => setPreviewUrl(review.fileUrl)} 
+                            variant="link" 
+                            size="sm"
+                          >
+                            View Original
                           </Button>
+                          {review.status === "completed" && (
+                            <Button
+                              onClick={() => {
+                                if (!review.isPaid) {
+                                  toast({
+                                    title: "Payment Required",
+                                    description: "Please purchase access to view your reviewed CV",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
+                                setPreviewUrl(review.reviewedFileUrl);
+                              }}
+                              variant="link"
+                              size="sm"
+                              className="text-primary"
+                            >
+                              {review.isPaid ? "View Review" : "Purchase Review ($99)"}
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

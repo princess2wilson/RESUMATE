@@ -17,10 +17,12 @@ export const cvReviews = pgTable("cv_reviews", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   fileUrl: text("file_url").notNull(),
+  reviewedFileUrl: text("reviewed_file_url"), // Added reviewedFileUrl column
   status: text("status").notNull().default("pending"),
   feedback: text("feedback"),
   createdAt: text("created_at").notNull(),
   isPromotional: boolean("is_promotional").notNull().default(false),
+  isPaid: boolean("is_paid").notNull().default(false), // Added isPaid column
 });
 
 export const insertUserSchema = createInsertSchema(users)
