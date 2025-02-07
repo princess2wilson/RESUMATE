@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Calendar } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ErrorBoundary } from "./error-boundary";
 
 export function ConsultationForm() {
   const scriptRef = useRef<HTMLScriptElement | null>(null);
@@ -68,7 +69,7 @@ export function ConsultationForm() {
     };
   }, []);
 
-  return (
+  const content = (
     <div className="relative">
       {error && (
         <Alert variant="destructive" className="mb-4">
@@ -91,4 +92,6 @@ export function ConsultationForm() {
       )}
     </div>
   );
+
+  return <ErrorBoundary>{content}</ErrorBoundary>;
 }
