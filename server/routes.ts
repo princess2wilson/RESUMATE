@@ -35,8 +35,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
   
-  // Serve uploaded files
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  // Serve uploaded files with CORS headers
+  app.use('/uploads', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  }, express.static(path.join(process.cwd(), 'uploads')));
 
   // Add this new route to help with OAuth configuration
   app.get("/api/auth/config", (req, res) => {

@@ -265,15 +265,14 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1 p-4">
                   {previewUrl.toLowerCase().endsWith('.pdf') ? (
-                    <iframe 
-                      src={previewUrl + '#toolbar=0'}
-                      title="CV Preview" 
+                    <embed 
+                      src={previewUrl}
+                      type="application/pdf"
                       className="w-full h-full rounded border"
-                      sandbox="allow-same-origin allow-scripts"
                     />
                   ) : (
                     <iframe 
-                      src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(window.location.origin + '/' + previewUrl)}`}
+                      src={`https://docs.google.com/gview?url=${encodeURIComponent(window.location.origin + previewUrl)}&embedded=true`}
                       title="CV Preview" 
                       className="w-full h-full rounded border"
                       frameBorder="0"
