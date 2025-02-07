@@ -265,10 +265,10 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1 p-4">
                   <iframe 
-                    src={`${previewUrl}#toolbar=0&navpanes=0&view=FitH`}
+                    src={previewUrl}
                     title="CV Preview" 
                     className="w-full h-full rounded border"
-                    sandbox="allow-same-origin"
+                    sandbox="allow-same-origin allow-scripts"
                   />
                 </div>
               </div>
