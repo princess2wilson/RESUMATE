@@ -35,7 +35,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export function registerRoutes(app: Express): Server {
   // Configure trust proxy for production environment behind Replit's proxy
   if (app.get('env') === 'production') {
-    app.set('trust proxy', 'uniquelocal');
+    app.set('trust proxy', 1); // More specific trust proxy configuration
   }
 
   // Configure rate limiting
@@ -44,10 +44,11 @@ export function registerRoutes(app: Express): Server {
     max: 100, // Limit each IP to 100 requests per windowMs
     standardHeaders: true,
     legacyHeaders: false,
-    trustProxy: function (req) {
-      // only trust if you're behind a reverse proxy (Heroku, Bluemix, AWS if you set a reverse proxy)
-      return req.headers['x-forwarded-for']
-    }
+    // Added error handler
+    handler: function (req, res) {
+      return res.status(429).json({ error: 'Too Many Requests' });
+    },
+    trustProxy: true // Trust proxy for rate limiting
   });
 
   // Apply rate limiting to all routes

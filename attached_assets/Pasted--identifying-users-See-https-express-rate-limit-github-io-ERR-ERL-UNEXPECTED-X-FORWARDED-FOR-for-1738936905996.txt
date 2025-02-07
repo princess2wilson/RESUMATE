@@ -1,0 +1,21 @@
+ identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+    at Object.xForwardedForHeader (file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:159:13)
+    at wrappedValidations.<computed> [as xForwardedForHeader] (file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:370:22)
+    at Object.keyGenerator (file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:643:20)
+    at file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:696:32
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:676:5 {
+  code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+  help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+}
+ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+    at Object.xForwardedForHeader (file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:159:13)
+    at wrappedValidations.<computed> [as xForwardedForHeader] (file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:370:22)
+    at Object.keyGenerator (file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:643:20)
+    at file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:696:32
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///home/runner/workspace/node_modules/express-rate-limit/dist/index.mjs:676:5 {
+  code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+  help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+}
+2:01:24 PM [express] GET /api/user 401 in 2ms :: {"error":"Not authenticated"}
