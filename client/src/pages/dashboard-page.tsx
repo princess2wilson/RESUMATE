@@ -255,10 +255,22 @@ export default function DashboardPage() {
           </Card>
           {/* Preview Dialog */}
           {previewUrl && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-              <div className="bg-white p-4 rounded shadow-lg max-w-lg">
-                <iframe src={previewUrl} title="CV Preview" width="100%" height="500" />
-                <Button onClick={() => setPreviewUrl(null)} className="mt-4">Close</Button>
+            <div className="fixed inset-0 z-50 bg-black/80">
+              <div className="fixed inset-4 bg-white rounded-lg shadow-xl flex flex-col">
+                <div className="p-4 border-b flex justify-between items-center">
+                  <h2 className="text-lg font-semibold">CV Preview</h2>
+                  <Button variant="ghost" size="sm" onClick={() => setPreviewUrl(null)}>
+                    Close
+                  </Button>
+                </div>
+                <div className="flex-1 p-4">
+                  <iframe 
+                    src={`${previewUrl}#toolbar=0&navpanes=0&view=FitH`}
+                    title="CV Preview" 
+                    className="w-full h-full rounded border"
+                    sandbox="allow-same-origin"
+                  />
+                </div>
               </div>
             </div>
           )}
