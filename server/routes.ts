@@ -91,6 +91,12 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
+      // Check upload limit
+      const existingReviews = await storage.getCVReviews(req.user.id);
+      if (existingReviews.length >= 2) {
+        return res.status(400).json({ error: "Maximum of 2 CV uploads per account reached" });
+      }
+
       try {
         const review = await storage.createCVReview({
           userId: req.user.id,

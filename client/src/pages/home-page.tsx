@@ -215,6 +215,10 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                      Maximum 2 CV submissions per account
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
                       Unpaid submissions auto-removed after 24h
                     </li>
                   </ul>
