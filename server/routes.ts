@@ -34,7 +34,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
-  
+
   // Serve uploaded files with CORS headers
   app.use('/uploads', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -74,10 +74,22 @@ export function registerRoutes(app: Express): Server {
   // CV Review routes (require authentication)
   const cvUpload = upload.single("file");
 
-  app.post("/api/cv-review", (req, res, next) => {
+  app.post("/api/cv-review", async (req, res, next) => {
     // Check authentication first
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Check upload limits
+    const userReviews = await storage.getCVReviews(req.user.id);
+    if (userReviews.length >= 2) {
+      return res.status(403).json({ error: "Maximum upload limit (2) reached" });
+    }
+
+    // Add rate limiting
+    const lastUpload = userReviews[userReviews.length - 1];
+    if (lastUpload && Date.now() - new Date(lastUpload.createdAt).getTime() < 60000) {
+      return res.status(429).json({ error: "Please wait 1 minute between uploads" });
     }
 
     // If authenticated, proceed with file upload

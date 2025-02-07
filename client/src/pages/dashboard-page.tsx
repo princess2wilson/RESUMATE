@@ -32,8 +32,13 @@ export default function DashboardPage() {
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      // Validate file type
+      // Validate file type and size
       const allowedTypes = ['.pdf', '.doc', '.docx'];
+      const maxSize = 5 * 1024 * 1024; // 5MB limit
+      
+      if (file.size > maxSize) {
+        throw new Error('File size exceeds 5MB limit');
+      }
       const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedTypes.includes(fileExtension)) {
         throw new Error('Invalid file type. Please upload a PDF, DOC, or DOCX file.');
