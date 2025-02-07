@@ -55,14 +55,14 @@ export default function AuthPage() {
     } catch (err) {
       if (err instanceof Error) {
         if (err.message.includes("Invalid email or password")) {
-          setError("Oops! 🤔 The email or password didn't quite match our records. Want to give it another try?");
+          setError("The email or password you entered is incorrect. Please try again.");
         } else if (err.message.includes("Email already exists")) {
-          setError("Looks like we're already friends! 👋 Try logging in instead, or use a different email address.");
+          setError("This email is already registered. Please try logging in instead.");
         } else {
-          setError("Something unexpected happened on our end. 🛠️ Please try again in a moment!");
+          setError("An error occurred. Please try again.");
         }
       } else {
-        setError("We hit a small bump in the road. 🚧 Mind trying that again?");
+        setError("Please try again.");
       }
     }
   };
