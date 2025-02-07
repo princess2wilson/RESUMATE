@@ -148,8 +148,7 @@ export default function CVSubmissionPage() {
               <CardHeader>
                 <CardTitle>Submit Your CV Now</CardTitle>
                 <CardDescription>
-                  Start with a free submission - pay only when you're ready to access the feedback. 
-                  Maximum of 2 CV submissions per account.
+                  Start with a free submission - pay only when you're ready to access the feedback
                 </CardDescription>
               </CardHeader>
               <CardContent>

@@ -76,7 +76,7 @@ export function registerRoutes(app: Express): Server {
 
   app.post("/api/cv-review", (req, res, next) => {
     // Check authentication first
-    if (!req.isAuthenticated() || !req.user) {
+    if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
@@ -91,20 +91,13 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      // Check upload limit
-      const existingReviews = await storage.getCVReviews(req.user.id);
-      if (existingReviews.length >= 2) {
-        return res.status(400).json({ error: "Maximum of 2 CV uploads per account reached" });
-      }
-
       try {
         const review = await storage.createCVReview({
           userId: req.user.id,
           fileUrl: `/uploads/${path.basename(req.file.path)}`,
-          status: "awaiting_payment",
+          status: "pending",
           feedback: null,
           createdAt: new Date().toISOString(),
-          paymentDeadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
           isPromotional: false
         });
         res.json(review);

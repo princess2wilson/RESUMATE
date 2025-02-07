@@ -201,35 +201,16 @@ export default function DashboardPage() {
                         </TableCell>
                         <TableCell>
                           <Badge
-                            variant={
-                              review.status === "completed" 
-                                ? "default" 
-                                : review.status === "awaiting_payment"
-                                ? "warning"
-                                : "secondary"
-                            }
-                            className={
-                              review.status === "completed" 
-                                ? "bg-green-100 text-green-800"
-                                : review.status === "awaiting_payment"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : ""
-                            }
+                            variant={review.status === "completed" ? "default" : "secondary"}
+                            className={review.status === "completed" ? "bg-green-100 text-green-800" : ""}
                           >
                             {review.status === "completed" ? (
                               <Check className="w-3 h-3 mr-1" />
-                            ) : review.status === "awaiting_payment" ? (
-                              <Lock className="w-3 h-3 mr-1" />
                             ) : (
                               <Clock className="w-3 h-3 mr-1" />
                             )}
-                            {review.status === "awaiting_payment" ? "Payment Required" : review.status}
+                            {review.status}
                           </Badge>
-                          {review.status === "awaiting_payment" && review.paymentDeadline && (
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Expires in {Math.max(0, Math.floor((new Date(review.paymentDeadline).getTime() - Date.now()) / (1000 * 60 * 60)))} hours
-                            </div>
-                          )}
                         </TableCell>
                         <TableCell>
                           {review.feedback || (
