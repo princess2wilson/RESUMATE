@@ -41,19 +41,9 @@ export default function DashboardPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      // Use fetch directly to ensure proper credential handling
-      const response = await fetch("/api/cv-review", {
-        method: "POST",
-        body: formData,
-        credentials: "include"
-      });
-
+      const response = await apiRequest("POST", "/api/cv-review", formData);
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Please log in again to upload your CV.');
-        }
-        const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
-        throw new Error(errorData.error || 'Failed to upload CV');
+        throw new Error('Failed to upload CV. Please try again.');
       }
       return response.json();
     },
@@ -67,14 +57,10 @@ export default function DashboardPage() {
     },
     onError: (error: Error) => {
       toast({
-        title: "Oops! Upload Hiccup 😅",
+        title: "Upload Failed",
         description: error.message,
         variant: "destructive",
       });
-      if (error.message.includes('Please log in again')) {
-        // Refresh the page to trigger re-authentication
-        window.location.reload();
-      }
     },
   });
 
