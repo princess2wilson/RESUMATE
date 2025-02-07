@@ -55,14 +55,14 @@ export default function AuthPage() {
     } catch (err) {
       if (err instanceof Error) {
         if (err.message.includes("Invalid email or password")) {
-          setError("The email or password you entered is incorrect. Please try again.");
+          setError("Oops! 🤔 The email or password didn't quite match our records. Want to give it another try?");
         } else if (err.message.includes("Email already exists")) {
-          setError("This email is already taken. Please use a different one.");
+          setError("Looks like we're already friends! 👋 Try logging in instead, or use a different email address.");
         } else {
-          setError("Something went wrong. Please try again later.");
+          setError("Something unexpected happened on our end. 🛠️ Please try again in a moment!");
         }
       } else {
-        setError("An unexpected error occurred. Please try again.");
+        setError("We hit a small bump in the road. 🚧 Mind trying that again?");
       }
     }
   };
@@ -113,7 +113,7 @@ export default function AuthPage() {
                     <p className="flex items-start gap-2">
                       <span className="mt-0.5">🔒</span>
                       <span>
-                        Don't worry! We only need these details to create your secure portal for CV reviews. 
+                        Don't worry! We only need these details to create your secure portal for CV reviews.
                         <span className="block mt-1 text-muted-foreground">
                           No spam emails, no newsletters - just a safe space for your career growth journey! <span className="ml-1">✨</span>
                         </span>

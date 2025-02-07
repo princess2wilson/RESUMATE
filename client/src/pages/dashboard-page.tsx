@@ -97,7 +97,7 @@ export default function DashboardPage() {
         <div className="max-w-4xl mx-auto">
           <header className="mb-8">
             <h1 className="text-3xl font-bold mb-2">
-              Welcome back, {user?.firstName || user?.username}
+              Welcome back {user?.firstName ? user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1) : user?.username}
             </h1>
             <p className="text-muted-foreground">
               Track your CV reviews and upload new documents for professional feedback.
