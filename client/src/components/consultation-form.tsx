@@ -34,7 +34,7 @@ export function ConsultationForm() {
 
         try {
           (window as any).Calendly.initInlineWidget({
-            url: import.meta.env.VITE_CALENDLY_URL || 'https://calendly.com/your-calendly-url',
+            url: 'https://calendly.com/resumate/career-consultation',
             parentElement,
             prefill: {},
             utm: {},
