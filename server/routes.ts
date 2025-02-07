@@ -260,9 +260,13 @@ export function registerRoutes(app: Express): Server {
       // 3. Send a notification to the admin
       
       // Send email with Calendly link
-      await sendConsultationEmail(email, name);
-      
-      res.json({ success: true });
+      try {
+        await sendConsultationEmail(email, name);
+        res.json({ success: true });
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        res.status(500).json({ error: 'Failed to send confirmation email' });
+      }
     } catch (error) {
       console.error('Error processing consultation request:', error);
       res.status(500).json({ error: 'Failed to process consultation request' });
