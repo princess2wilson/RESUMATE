@@ -9,7 +9,6 @@ import { insertCVReviewSchema } from "@shared/schema";
 import Stripe from "stripe";
 import mammoth from 'mammoth';
 import fs from 'fs';
-import path from 'path';
 
 const upload = multer({ dest: "uploads/" });
 
@@ -33,8 +32,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export function registerRoutes(app: Express): Server {
+  // Trust proxy - important for secure headers behind Replit's proxy
+  app.set('trust proxy', true);
+
   setupAuth(app);
-  
+
   // Serve uploaded files with CORS headers
   app.use('/uploads', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
