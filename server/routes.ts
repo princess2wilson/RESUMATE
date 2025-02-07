@@ -3,12 +3,13 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import multer from "multer";
-import path from "path";
 import express from "express";
 import { insertCVReviewSchema } from "@shared/schema";
 import Stripe from "stripe";
 import mammoth from 'mammoth';
 import fs from 'fs';
+import rateLimit from 'express-rate-limit';
+import path from 'path';
 
 const upload = multer({ dest: "uploads/" });
 
@@ -32,8 +33,25 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 });
 
 export function registerRoutes(app: Express): Server {
-  // Trust proxy - important for secure headers behind Replit's proxy
-  app.set('trust proxy', true);
+  // Configure trust proxy for production environment behind Replit's proxy
+  if (app.get('env') === 'production') {
+    app.set('trust proxy', 'uniquelocal');
+  }
+
+  // Configure rate limiting
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    standardHeaders: true,
+    legacyHeaders: false,
+    trustProxy: function (req) {
+      // only trust if you're behind a reverse proxy (Heroku, Bluemix, AWS if you set a reverse proxy)
+      return req.headers['x-forwarded-for']
+    }
+  });
+
+  // Apply rate limiting to all routes
+  app.use(limiter);
 
   setupAuth(app);
 
