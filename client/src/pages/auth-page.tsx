@@ -54,15 +54,9 @@ export default function AuthPage() {
       }
     } catch (err) {
       if (err instanceof Error) {
-        if (err.message.includes("Invalid email or password")) {
-          setError("The email or password you entered is incorrect. Please try again.");
-        } else if (err.message.includes("Email already exists")) {
-          setError("This email is already registered. Please try logging in instead.");
-        } else {
-          setError("An error occurred. Please try again.");
-        }
+        setError(err.message);
       } else {
-        setError("Please try again.");
+        setError("An unexpected error occurred. Please try again.");
       }
     }
   };

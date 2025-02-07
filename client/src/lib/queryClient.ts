@@ -5,16 +5,12 @@ async function throwIfResNotOk(res: Response) {
     let errorMessage: string;
     try {
       const errorData = await res.json();
-      errorMessage = errorData.error || res.statusText;
+      errorMessage = errorData.error;
     } catch {
       errorMessage = await res.text() || res.statusText;
     }
 
-    // Customize authentication error messages
-    if (res.status === 401) {
-      throw new Error("Please sign in to continue");
-    }
-
+    // Pass through the actual error message
     throw new Error(errorMessage);
   }
 }
