@@ -4,6 +4,8 @@ import { setupVite, serveStatic, log } from "./vite";
 import { loginLimiter, apiLimiter, auditLogger, securityHeaders } from "./middleware/security";
 
 const app = express();
+// Trust proxy for Replit's environment
+app.set('trust proxy', true);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
