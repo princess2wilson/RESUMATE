@@ -22,19 +22,27 @@ export function ConsultationForm() {
 
     // Initialize Calendly after script loads
     script.onload = () => {
+      console.log('Calendly script loaded');
       if ((window as any).Calendly) {
-        const schedulingUrl = import.meta.env.VITE_CALENDLY_URL || process.env.CALENDLY_SCHEDULING_URL;
+        const schedulingUrl = import.meta.env.VITE_CALENDLY_URL;
+        console.log('Calendly URL:', schedulingUrl);
         
         if (!schedulingUrl) {
           console.error('Calendly scheduling URL is not set');
           return;
         }
 
+        const parentElement = document.querySelector('.calendly-inline-widget');
+        if (!parentElement) {
+          console.error('Calendly parent element not found');
+          return;
+        }
+
         (window as any).Calendly.initInlineWidget({
           url: schedulingUrl,
-          parentElement: document.querySelector('.calendly-inline-widget'),
+          parentElement,
           prefill: {},
-          utm: {}
+          utm: {},
         });
 
         // Hide loading state once widget is ready
