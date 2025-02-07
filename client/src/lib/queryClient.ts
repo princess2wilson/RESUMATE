@@ -2,20 +2,42 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    let errorMessage: string;
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.error || res.statusText;
+    } catch {
+      errorMessage = await res.text() || res.statusText;
+    }
+
+    // Customize authentication error messages
+    if (res.status === 401) {
+      throw new Error("Please sign in to continue");
+    }
+
+    throw new Error(errorMessage);
   }
 }
 
 export async function apiRequest(
   method: string,
   url: string,
-  data?: unknown | undefined,
+  data?: unknown | FormData,
 ): Promise<Response> {
+  const headers: HeadersInit = {};
+  let body: string | FormData | undefined;
+
+  if (data instanceof FormData) {
+    body = data;
+  } else if (data) {
+    headers["Content-Type"] = "application/json";
+    body = JSON.stringify(data);
+  }
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
+    headers,
+    body,
     credentials: "include",
   });
 

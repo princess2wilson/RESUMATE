@@ -51,13 +51,13 @@ export function registerRoutes(app: Express): Server {
   // CV Review routes (require authentication)
   const cvUpload = upload.single("file");
 
-  app.post("/api/cv-review", async (req, res) => {
+  app.post("/api/cv-review", (req, res, next) => {
     // Check authentication first
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    // Handle file upload after authentication
+    // If authenticated, proceed with file upload
     cvUpload(req, res, async (err) => {
       if (err) {
         console.error('File upload error:', err);

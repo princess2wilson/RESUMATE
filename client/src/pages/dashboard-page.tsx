@@ -40,7 +40,14 @@ export default function DashboardPage() {
 
       const formData = new FormData();
       formData.append("file", file);
-      const response = await apiRequest("POST", "/api/cv-review", formData);
+
+      // Use fetch directly to ensure proper credential handling
+      const response = await fetch("/api/cv-review", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+      });
+
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error('Please log in again to upload your CV.');
@@ -54,13 +61,13 @@ export default function DashboardPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/cv-reviews"] });
       setFile(null);
       toast({
-        title: "CV Uploaded Successfully",
+        title: "CV Uploaded Successfully! 🎉",
         description: "Your CV has been submitted for review. We'll notify you once it's ready.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Upload Failed",
+        title: "Oops! Upload Hiccup 😅",
         description: error.message,
         variant: "destructive",
       });
