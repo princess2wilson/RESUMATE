@@ -25,6 +25,16 @@ export const cvReviews = pgTable("cv_reviews", {
   isPaid: boolean("is_paid").notNull().default(false),
 });
 
+export const products = pgTable("products", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  price: integer("price").notNull(),
+  type: text("type").notNull(),
+  stripeProductId: text("stripe_product_id"),
+  stripePriceId: text("stripe_price_id"),
+});
+
 export const auditLogs = pgTable("audit_logs", {
   id: serial("id").primaryKey(),
   userId: integer("user_id"),
@@ -50,7 +60,15 @@ export const insertUserSchema = createInsertSchema(users)
     firstName: z.string().min(1, "Please let us know what to call you"),
   });
 
+export const insertProductSchema = createInsertSchema(products).omit({
+  id: true,
+  stripeProductId: true,
+  stripePriceId: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type CVReview = typeof cvReviews.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
+export type Product = typeof products.$inferSelect;
+export type InsertProduct = z.infer<typeof insertProductSchema>;

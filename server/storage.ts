@@ -1,4 +1,4 @@
-import { User, InsertUser, CVReview, AuditLog } from "@shared/schema";
+import { User, InsertUser, CVReview, AuditLog, Product, InsertProduct } from "@shared/schema";
 import session from "express-session";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -17,6 +17,11 @@ export interface IStorage {
   getAllCVReviews(): Promise<CVReview[]>;
   updateCVReview(id: number, feedback: string): Promise<CVReview>;
   createAuditLog(logEntry: Omit<AuditLog, "id">): Promise<void>;
+  // Add product-related methods
+  getProducts(): Promise<Product[]>;
+  getProduct(id: number): Promise<Product | undefined>;
+  createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: number, updates: Partial<Product>): Promise<Product>;
   sessionStore: session.Store;
 }
 
@@ -134,6 +139,55 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error('Error creating audit log:', error);
       // Don't throw error to prevent disrupting the main application flow
+    }
+  }
+
+  async getProducts(): Promise<Product[]> {
+    try {
+      return await db.select().from(schema.products);
+    } catch (error) {
+      console.error('Error getting products:', error);
+      throw new Error('Failed to get products');
+    }
+  }
+
+  async getProduct(id: number): Promise<Product | undefined> {
+    try {
+      const [product] = await db
+        .select()
+        .from(schema.products)
+        .where(eq(schema.products.id, id));
+      return product;
+    } catch (error) {
+      console.error('Error getting product:', error);
+      throw new Error('Failed to get product');
+    }
+  }
+
+  async createProduct(insertProduct: InsertProduct): Promise<Product> {
+    try {
+      const [product] = await db
+        .insert(schema.products)
+        .values(insertProduct)
+        .returning();
+      return product;
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw new Error('Failed to create product');
+    }
+  }
+
+  async updateProduct(id: number, updates: Partial<Product>): Promise<Product> {
+    try {
+      const [product] = await db
+        .update(schema.products)
+        .set(updates)
+        .where(eq(schema.products.id, id))
+        .returning();
+      return product;
+    } catch (error) {
+      console.error('Error updating product:', error);
+      throw new Error('Failed to update product');
     }
   }
 }
