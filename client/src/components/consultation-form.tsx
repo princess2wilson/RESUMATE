@@ -12,28 +12,46 @@ export function ConsultationForm() {
     if (typeof window === 'undefined') return;
 
     try {
+      // Check if Calendly is already loaded
+      if ((window as any).Calendly) {
+        initializeCalendly();
+        return;
+      }
+
       // Load Calendly widget script
       const script = document.createElement('script');
       script.src = "https://assets.calendly.com/assets/external/widget.js";
       script.async = true;
       scriptRef.current = script;
 
-      // Initialize Calendly after script loads
-      script.onload = () => {
-        // Wait a brief moment to ensure Calendly is fully loaded
-        setTimeout(() => {
-          if (!(window as any).Calendly) {
-            setError('Could not load the scheduling widget. Please refresh the page.');
-            setIsLoading(false);
-            return;
-          }
+      const initializeCalendly = () => {
+        const parentElement = document.querySelector('.calendly-inline-widget');
+        if (!parentElement) {
+          setError('Could not initialize the booking widget. Please refresh the page.');
+          setIsLoading(false);
+          return;
+        }
 
-          const parentElement = document.querySelector('.calendly-inline-widget');
-          if (!parentElement) {
-            setError('Could not initialize the booking widget. Please refresh the page.');
-            setIsLoading(false);
-            return;
-          }
+        try {
+          (window as any).Calendly.initInlineWidget({
+            url: 'https://calendly.com/resumate/career-consultation',
+            parentElement,
+            prefill: {},
+            utm: {},
+          });
+          setError(null);
+          setIsLoading(false);
+        } catch (err) {
+          console.error('Failed to initialize Calendly:', err);
+          setError('Could not initialize the booking widget. Please try again later.');
+          setIsLoading(false);
+        }
+      };
+
+      script.onload = () => {
+        // Give a brief moment for Calendly to initialize
+        setTimeout(initializeCalendly, 100);
+      };
 
           try {
             if ((window as any).Calendly?.initInlineWidget) {
