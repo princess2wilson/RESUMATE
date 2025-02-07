@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const { toast } = useToast();
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // Add state for preview URL
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery<CVReview[]>({
     queryKey: ["/api/cv-reviews"],
@@ -217,10 +218,8 @@ export default function DashboardPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button variant="link" asChild size="sm">
-                            <a href={review.fileUrl} target="_blank" rel="noopener noreferrer">
-                              View CV
-                            </a>
+                          <Button onClick={() => setPreviewUrl(review.fileUrl)} variant="link" asChild size="sm">
+                            View CV
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -230,6 +229,15 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
+          {/* Preview Dialog */}
+          {previewUrl && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+              <div className="bg-white p-4 rounded shadow-lg max-w-lg">
+                <iframe src={previewUrl} title="CV Preview" width="100%" height="500" />
+                <Button onClick={() => setPreviewUrl(null)} className="mt-4">Close</Button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
