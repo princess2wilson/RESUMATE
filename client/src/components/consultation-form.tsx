@@ -38,12 +38,18 @@ export function ConsultationForm() {
           return;
         }
 
-        (window as any).Calendly.initInlineWidget({
-          url: schedulingUrl,
-          parentElement,
-          prefill: {},
-          utm: {},
-        });
+        try {
+          (window as any).Calendly.initInlineWidget({
+            url: schedulingUrl,
+            parentElement,
+            prefill: {},
+            utm: {},
+            text: 'Schedule time with me',
+            branding: true
+          });
+        } catch (error) {
+          console.error('Failed to initialize Calendly:', error);
+        }
 
         // Hide loading state once widget is ready
         if (fallback) {
