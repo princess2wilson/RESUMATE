@@ -213,6 +213,10 @@ export default function HomePage() {
                       <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
                       48-hour turnaround
                     </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
+                      Unpaid submissions auto-removed after 24h
+                    </li>
                   </ul>
                   <div className="mt-4 mb-6">
                     <span className="text-2xl font-bold">
