@@ -6,7 +6,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull(),
   password: text("password").notNull(),
-  firstName: text("firstName").notNull(),  
+  firstName: text("first_name").notNull(),  // Changed from firstName to first_name
   isAdmin: boolean("is_admin").notNull().default(false),
   googleId: text("google_id"),
   linkedinId: text("linkedin_id"),
