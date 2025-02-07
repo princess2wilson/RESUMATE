@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import multer from "multer";
+import path from "path";
+import express from "express";
 import { insertCVReviewSchema } from "@shared/schema";
 import Stripe from "stripe";
 
@@ -18,6 +20,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
+  
+  // Serve uploaded files
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   // Add this new route to help with OAuth configuration
   app.get("/api/auth/config", (req, res) => {
