@@ -140,7 +140,7 @@ export default function HomePage() {
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
                 >
-                  Find Your Career Soul
+                  Find Your Career Team
                   <span className="gradient-text">mate</span>
                 </motion.h1>
                 <motion.p
