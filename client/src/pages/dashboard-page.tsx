@@ -218,7 +218,7 @@ export default function DashboardPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button onClick={() => setPreviewUrl(review.fileUrl)} variant="link" asChild size="sm">
+                          <Button onClick={() => setPreviewUrl(review.fileUrl)} variant="link" size="sm">
                             View CV
                           </Button>
                         </TableCell>
