@@ -1,0 +1,51 @@
+chunk-RPCDYKBN.js?v=aa6c91eb:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+queryClient.ts:50 
+        
+        
+       GET https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev/api/user 401 (Unauthorized)
+(anonymous) @ queryClient.ts:50
+fetchFn @ @tanstack_react-query.js?v=aa6c91eb:840
+run @ @tanstack_react-query.js?v=aa6c91eb:494
+start @ @tanstack_react-query.js?v=aa6c91eb:536
+fetch @ @tanstack_react-query.js?v=aa6c91eb:926
+executeFetch_fn @ @tanstack_react-query.js?v=aa6c91eb:2211
+onSubscribe @ @tanstack_react-query.js?v=aa6c91eb:1898
+subscribe @ @tanstack_react-query.js?v=aa6c91eb:24
+(anonymous) @ @tanstack_react-query.js?v=aa6c91eb:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=aa6c91eb:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=aa6c91eb:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=aa6c91eb:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=aa6c91eb:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=aa6c91eb:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=aa6c91eb:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=aa6c91eb:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=aa6c91eb:19447
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=aa6c91eb:18868
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=aa6c91eb:9119
+commitRootImpl @ chunk-RPCDYKBN.js?v=aa6c91eb:19432
+commitRoot @ chunk-RPCDYKBN.js?v=aa6c91eb:19277
+finishConcurrentRender @ chunk-RPCDYKBN.js?v=aa6c91eb:18805
+performConcurrentWorkOnRoot @ chunk-RPCDYKBN.js?v=aa6c91eb:18718
+workLoop @ chunk-RPCDYKBN.js?v=aa6c91eb:197
+flushWork @ chunk-RPCDYKBN.js?v=aa6c91eb:176
+performWorkUntilDeadline @ chunk-RPCDYKBN.js?v=aa6c91eb:384Understand this errorAI
+15Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.Understand this warningAI
+widget.js:1 Uncaught TypeError: Cannot read properties of null (reading 'split')
+    at h.parseOptions (widget.js:1:2055)
+    at new h (widget.js:1:1454)
+    at widget.js:1:11199
+    at Array.forEach (<anonymous>)
+    at widget.js:1:11063
+    at o (widget.js:1:576)
+    at widget.js:1:10980
+    at widget.js:1:11288
+    at widget.js:1:11436
+parseOptions @ widget.js:1
+h @ widget.js:1
+(anonymous) @ widget.js:1
+(anonymous) @ widget.js:1
+o @ widget.js:1
+(anonymous) @ widget.js:1
+(anonymous) @ widget.js:1
+(anonymous) @ widget.js:1Understand this errorAI
+consultation-form.tsx:25 Calendly script loaded
