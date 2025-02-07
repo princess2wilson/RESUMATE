@@ -36,12 +36,17 @@ export function ConsultationForm() {
           }
 
           try {
-            (window as any).Calendly.initInlineWidget({
-              url: 'https://calendly.com/resumate/career-consultation',
-              parentElement,
-              prefill: {},
-              utm: {},
-            });
+            if ((window as any).Calendly?.initInlineWidget) {
+              (window as any).Calendly.initInlineWidget({
+                url: 'https://calendly.com/resumate/career-consultation',
+                parentElement,
+                prefill: {},
+                utm: {},
+              });
+              setError(null); // Clear any previous errors
+            } else {
+              throw new Error('Calendly widget not initialized properly');
+            }
             setIsLoading(false);
           } catch (err) {
           console.error('Failed to initialize Calendly:', err);
