@@ -94,7 +94,7 @@ export function registerRoutes(app: Express): Server {
       try {
         const review = await storage.createCVReview({
           userId: req.user.id,
-          fileUrl: req.file.path,
+          fileUrl: `/uploads/${path.basename(req.file.path)}`,
           status: "pending",
           feedback: null,
           createdAt: new Date().toISOString(),

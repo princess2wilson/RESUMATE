@@ -266,7 +266,7 @@ export default function DashboardPage() {
                 <div className="flex-1 p-4">
                   {previewUrl.toLowerCase().endsWith('.pdf') ? (
                     <embed 
-                      src={previewUrl}
+                      src={window.location.origin + previewUrl}
                       type="application/pdf"
                       className="w-full h-full rounded border"
                     />
