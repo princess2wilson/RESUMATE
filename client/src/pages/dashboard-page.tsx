@@ -18,10 +18,12 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
+  const { toast } = useToast();
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery<CVReview[]>({
     queryKey: ["/api/cv-reviews"],
@@ -29,19 +31,36 @@ export default function DashboardPage() {
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
+      // Validate file type
+      const allowedTypes = ['.pdf', '.doc', '.docx'];
+      const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!allowedTypes.includes(fileExtension)) {
+        throw new Error('Invalid file type. Please upload a PDF, DOC, or DOCX file.');
+      }
+
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/cv-review", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Upload failed");
-      return res.json();
+      const response = await apiRequest("POST", "/api/cv-review", formData);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
+        throw new Error(errorData.error || 'Failed to upload CV');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/cv-reviews"] });
       setFile(null);
+      toast({
+        title: "CV Uploaded Successfully",
+        description: "Your CV has been submitted for review. We'll notify you once it's ready.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Upload Failed",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -175,7 +194,7 @@ export default function DashboardPage() {
                           {format(new Date(review.createdAt), "PPP")}
                         </TableCell>
                         <TableCell>
-                          <Badge 
+                          <Badge
                             variant={review.status === "completed" ? "default" : "secondary"}
                             className={review.status === "completed" ? "bg-green-100 text-green-800" : ""}
                           >
