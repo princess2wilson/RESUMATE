@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles, Star, Heart } from "lucide-react";
+import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles, Star, Heart, Clock } from "lucide-react"; // Added Clock import
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -197,7 +197,7 @@ export default function HomePage() {
             className="text-center mb-16"
             variants={fadeIn}
           >
-            <motion.p 
+            <motion.p
               className="uppercase-spaced text-primary mb-4"
               variants={pulse}
             >
@@ -235,21 +235,33 @@ export default function HomePage() {
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
                   <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Detailed analysis & scoring
+                    <li className="flex items-start gap-3">
+                      <FileText className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Detailed Analysis & Scoring</h3>
+                        <p>Comprehensive review of your CV structure and content</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Industry-specific advice
+                    <li className="flex items-start gap-3">
+                      <Users className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Industry-Specific Advice</h3>
+                        <p>Tailored recommendations for your sector</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      48-hour turnaround
+                    <li className="flex items-start gap-3">
+                      <Clock className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Quick Turnaround</h3>
+                        <p>Get your review within 48 hours</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Unpaid submissions auto-removed after 24h
+                    <li className="flex items-start gap-3">
+                      <Star className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">First 10 Submissions</h3>
+                        <p>Get 70% off the regular price</p>
+                      </div>
                     </li>
                   </ul>
                   <div className="mt-4 mb-6">
@@ -290,17 +302,26 @@ export default function HomePage() {
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
                   <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      CV Templates
+                    <li className="flex items-start gap-3">
+                      <FileText className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Professional CV Templates</h3>
+                        <p>Industry-approved formats for maximum impact</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Interview Guides
+                    <li className="flex items-start gap-3">
+                      <Users className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Interview Guides</h3>
+                        <p>Comprehensive preparation materials</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Career Resources
+                    <li className="flex items-start gap-3">
+                      <Star className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Career Resources</h3>
+                        <p>Expert tips and industry insights</p>
+                      </div>
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced mt-auto" asChild>
