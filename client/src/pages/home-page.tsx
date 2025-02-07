@@ -140,8 +140,8 @@ export default function HomePage() {
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
                 >
-                  Every Career Journey Needs Guidance,
-                  <span className="gradient-text"> a Mate</span>
+                  Every Career Journey Needs Guidance, a
+                  <span className="gradient-text"> Mate</span>
                 </motion.h1>
                 <motion.p
                   className="text-xl text-muted-foreground max-w-[800px] mx-auto leading-relaxed"
