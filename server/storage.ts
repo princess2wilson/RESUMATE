@@ -12,12 +12,10 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-
   createCVReview(review: Omit<CVReview, "id">): Promise<CVReview>;
   getCVReviews(userId: number): Promise<CVReview[]>;
   getAllCVReviews(): Promise<CVReview[]>;
   updateCVReview(id: number, feedback: string): Promise<CVReview>;
-
   sessionStore: session.Store;
 }
 
@@ -28,6 +26,7 @@ export class DatabaseStorage implements IStorage {
     this.sessionStore = new PostgresSessionStore({
       pool,
       createTableIfMissing: true,
+      tableName: 'session'
     });
   }
 

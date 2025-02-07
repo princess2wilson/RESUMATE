@@ -4,10 +4,13 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  email: text("email").notNull().unique(),
+  email: text("email").notNull(),
   password: text("password").notNull(),
-  firstName: text("first_name").notNull(),
+  firstName: text("firstName").notNull(),  
   isAdmin: boolean("is_admin").notNull().default(false),
+  googleId: text("google_id"),
+  linkedinId: text("linkedin_id"),
+  username: text("username"),
 });
 
 export const cvReviews = pgTable("cv_reviews", {
@@ -31,10 +34,6 @@ export const insertUserSchema = createInsertSchema(users)
     password: z.string().min(8, "Password must be at least 8 characters"),
     firstName: z.string().min(1, "Please let us know what to call you"),
   });
-
-export const insertCVReviewSchema = createInsertSchema(cvReviews).pick({
-  fileUrl: true,
-});
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
