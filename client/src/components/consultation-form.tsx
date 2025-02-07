@@ -20,33 +20,36 @@ export function ConsultationForm() {
 
       // Initialize Calendly after script loads
       script.onload = () => {
-        if (!(window as any).Calendly) {
-          setError('Could not load the scheduling widget. Please refresh the page.');
-          setIsLoading(false);
-          return;
-        }
+        // Wait a brief moment to ensure Calendly is fully loaded
+        setTimeout(() => {
+          if (!(window as any).Calendly) {
+            setError('Could not load the scheduling widget. Please refresh the page.');
+            setIsLoading(false);
+            return;
+          }
 
-        const parentElement = document.querySelector('.calendly-inline-widget');
-        if (!parentElement) {
-          setError('Could not initialize the booking widget. Please refresh the page.');
-          setIsLoading(false);
-          return;
-        }
+          const parentElement = document.querySelector('.calendly-inline-widget');
+          if (!parentElement) {
+            setError('Could not initialize the booking widget. Please refresh the page.');
+            setIsLoading(false);
+            return;
+          }
 
-        try {
-          (window as any).Calendly.initInlineWidget({
-            url: 'https://calendly.com/resumate/career-consultation',
-            parentElement,
-            prefill: {},
-            utm: {},
-          });
-          setIsLoading(false);
-        } catch (err) {
+          try {
+            (window as any).Calendly.initInlineWidget({
+              url: 'https://calendly.com/resumate/career-consultation',
+              parentElement,
+              prefill: {},
+              utm: {},
+            });
+            setIsLoading(false);
+          } catch (err) {
           console.error('Failed to initialize Calendly:', err);
           setError('Could not initialize the booking widget. Please try again later.');
           setIsLoading(false);
         }
-      };
+      }, 1000); // Give a 1 second delay for initialization
+    };
 
       script.onerror = () => {
         setError('Failed to load the scheduling widget. Please check your internet connection.');
