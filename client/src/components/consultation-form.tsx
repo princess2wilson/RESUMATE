@@ -5,11 +5,17 @@ export function ConsultationForm() {
   const scriptRef = useRef<HTMLScriptElement | null>(null);
 
   useEffect(() => {
-    // Create script element
+    // Load Calendly widget script
     const script = document.createElement('script');
     script.src = "https://assets.calendly.com/assets/external/widget.js";
     script.async = true;
     scriptRef.current = script;
+
+    // Show loading state
+    const fallback = document.querySelector('.calendly-fallback');
+    if (fallback) {
+      fallback.classList.remove('hidden');
+    }
 
     // Add script to document
     document.body.appendChild(script);
@@ -17,17 +23,24 @@ export function ConsultationForm() {
     // Initialize Calendly after script loads
     script.onload = () => {
       if ((window as any).Calendly) {
+        const schedulingUrl = process.env.CALENDLY_SCHEDULING_URL;
+
         (window as any).Calendly.initInlineWidget({
-          url: 'https://calendly.com/resumate/career-consultation',
+          url: schedulingUrl,
           parentElement: document.querySelector('.calendly-inline-widget'),
           prefill: {},
           utm: {}
         });
+
+        // Hide loading state once widget is ready
+        if (fallback) {
+          fallback.classList.add('hidden');
+        }
       }
     };
 
     return () => {
-      // Only remove the script if it's still in the document
+      // Cleanup: remove script only if it's still in document
       if (scriptRef.current && document.body.contains(scriptRef.current)) {
         document.body.removeChild(scriptRef.current);
       }
@@ -35,10 +48,19 @@ export function ConsultationForm() {
   }, []);
 
   return (
-    <div 
-      className="calendly-inline-widget" 
-      data-url="https://calendly.com/resumate/career-consultation"
-      style={{ minWidth: '320px', height: '700px' }} 
-    />
+    <div className="relative">
+      <div 
+        className="calendly-inline-widget" 
+        style={{ minWidth: '320px', height: '700px' }} 
+      />
+      {/* Loading state */}
+      <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm calendly-fallback">
+        <div className="text-center">
+          <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p className="text-lg font-medium">Loading calendar...</p>
+          <p className="text-sm text-muted-foreground">Please wait while we set up your booking experience</p>
+        </div>
+      </div>
+    </div>
   );
 }
