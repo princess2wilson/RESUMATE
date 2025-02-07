@@ -1,8 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function ConsultationForm() {
   const scriptRef = useRef<HTMLScriptElement | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Load Calendly widget script
@@ -22,23 +24,15 @@ export function ConsultationForm() {
 
     // Initialize Calendly after script loads
     script.onload = () => {
-      console.log('Calendly script loaded');
       if ((window as any).Calendly) {
-        const schedulingUrl = import.meta.env.VITE_CALENDLY_URL;
-        console.log('Calendly URL:', schedulingUrl);
-        
-        if (!schedulingUrl) {
-          console.error('Calendly scheduling URL is not set');
-          return;
-        }
-
-        const parentElement = document.querySelector('.calendly-inline-widget');
-        if (!parentElement) {
-          console.error('Calendly parent element not found');
-          return;
-        }
-
         try {
+          const schedulingUrl = "https://calendly.com/resumate/career-consultation";
+
+          const parentElement = document.querySelector('.calendly-inline-widget');
+          if (!parentElement) {
+            throw new Error('Calendly parent element not found');
+          }
+
           (window as any).Calendly.initInlineWidget({
             url: schedulingUrl,
             parentElement,
@@ -47,13 +41,14 @@ export function ConsultationForm() {
             text: 'Schedule time with me',
             branding: true
           });
+
+          // Hide loading state once widget is ready
+          if (fallback) {
+            fallback.classList.add('hidden');
+          }
         } catch (error) {
           console.error('Failed to initialize Calendly:', error);
-        }
-
-        // Hide loading state once widget is ready
-        if (fallback) {
-          fallback.classList.add('hidden');
+          setError('Could not load the scheduling widget. Please try again later.');
         }
       }
     };
@@ -68,6 +63,11 @@ export function ConsultationForm() {
 
   return (
     <div className="relative">
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <div 
         className="calendly-inline-widget" 
         style={{ minWidth: '320px', height: '700px' }} 
