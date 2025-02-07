@@ -76,7 +76,7 @@ export function registerRoutes(app: Express): Server {
 
   app.post("/api/cv-review", (req, res, next) => {
     // Check authentication first
-    if (!req.isAuthenticated()) {
+    if (!req.isAuthenticated() || !req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
