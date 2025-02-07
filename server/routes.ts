@@ -249,10 +249,8 @@ export function registerRoutes(app: Express): Server {
       // 2. Send an email to the user with booking instructions
       // 3. Send a notification to the admin
       
-      // For now, we'll just log it
-      console.log('New consultation request:', { name, email, topics });
-      
-      // TODO: Implement email sending
+      // Send email with Calendly link
+      await sendConsultationEmail(email, name);
       
       res.json({ success: true });
     } catch (error) {
