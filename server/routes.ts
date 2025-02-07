@@ -7,8 +7,22 @@ import path from "path";
 import express from "express";
 import { insertCVReviewSchema } from "@shared/schema";
 import Stripe from "stripe";
+import mammoth from 'mammoth';
+import fs from 'fs';
+import path from 'path';
 
 const upload = multer({ dest: "uploads/" });
+
+// Helper to convert DOCX to HTML
+async function convertDocToHtml(filePath: string): Promise<string> {
+  try {
+    const result = await mammoth.convertToHtml({path: filePath});
+    return result.value;
+  } catch (error) {
+    console.error('Error converting doc:', error);
+    throw error;
+  }
+}
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("STRIPE_SECRET_KEY is required");

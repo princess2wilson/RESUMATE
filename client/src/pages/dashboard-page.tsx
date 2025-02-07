@@ -264,12 +264,21 @@ export default function DashboardPage() {
                   </Button>
                 </div>
                 <div className="flex-1 p-4">
-                  <iframe 
-                    src={previewUrl}
-                    title="CV Preview" 
-                    className="w-full h-full rounded border"
-                    sandbox="allow-same-origin allow-scripts"
-                  />
+                  {previewUrl.toLowerCase().endsWith('.pdf') ? (
+                    <iframe 
+                      src={previewUrl + '#toolbar=0'}
+                      title="CV Preview" 
+                      className="w-full h-full rounded border"
+                      sandbox="allow-same-origin allow-scripts"
+                    />
+                  ) : (
+                    <iframe 
+                      src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(window.location.origin + '/' + previewUrl)}`}
+                      title="CV Preview" 
+                      className="w-full h-full rounded border"
+                      frameBorder="0"
+                    />
+                  )}
                 </div>
               </div>
             </div>
