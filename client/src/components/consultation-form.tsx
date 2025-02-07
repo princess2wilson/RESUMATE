@@ -31,7 +31,10 @@ export function ConsultationForm() {
         body: JSON.stringify(data),
       });
       
-      if (!response.ok) throw new Error('Failed to submit request');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to submit request');
+      }
       
       setSuccess(true);
       reset();

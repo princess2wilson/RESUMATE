@@ -239,8 +239,18 @@ export function registerRoutes(app: Express): Server {
     } catch (err) {
 
 
+  // Rate limiter for consultation requests - max 2 per IP per year
+  const consultationLimiter = rateLimit({
+    windowMs: 365 * 24 * 60 * 60 * 1000, // 1 year window
+    max: 2, // Limit each IP to 2 requests per window
+    message: { error: "You have reached the maximum number of consultation requests for this year." },
+    standardHeaders: true,
+    legacyHeaders: false,
+    trustProxy: true // Trust X-Forwarded-For header
+  });
+
   // Consultation request endpoint
-  app.post("/api/consultation-request", async (req, res) => {
+  app.post("/api/consultation-request", consultationLimiter, async (req, res) => {
     try {
       const { name, email, topics } = req.body;
       
