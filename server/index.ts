@@ -5,7 +5,7 @@ import { loginLimiter, apiLimiter, auditLogger, securityHeaders } from "./middle
 
 const app = express();
 // Trust proxy for Replit's environment
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
