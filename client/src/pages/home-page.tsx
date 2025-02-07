@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles, Star } from "lucide-react";
+import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles, Star, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -26,6 +26,30 @@ const staggerChildren = {
   animate: {
     transition: {
       staggerChildren: 0.1
+    }
+  }
+};
+
+// Add floating animation
+const float = {
+  animate: {
+    y: [0, -10, 0],
+    transition: {
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  }
+};
+
+// Add pulse animation
+const pulse = {
+  animate: {
+    scale: [1, 1.05, 1],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "easeInOut"
     }
   }
 };
@@ -107,46 +131,53 @@ export default function HomePage() {
                   className="uppercase-spaced text-primary flex items-center justify-center gap-2"
                   variants={slideIn}
                 >
-                  TRANSFORM YOUR CAREER TODAY
+                  YOUR CAREER COMPANION
+                  <motion.span variants={float}>
+                    <Heart className="w-5 h-5 text-red-500" />
+                  </motion.span>
                 </motion.p>
                 <motion.h1
                   className="text-5xl lg:text-7xl font-serif font-bold tracking-tight"
                   variants={fadeIn}
                 >
-                  Elevate Your Professional Story with
-                  <span className="gradient-text"> Resumate</span>
+                  Meet Your Perfect Career
+                  <span className="gradient-text"> Mate</span>
                 </motion.h1>
                 <motion.p
                   className="text-xl text-muted-foreground max-w-[800px] mx-auto leading-relaxed"
                   variants={fadeIn}
                 >
-                  Get expert CV reviews, access premium career resources, and receive personalized
-                  guidance from industry professionals who understand your journey.
+                  We're not just another career platform - we're your trusted companion in the professional journey.
+                  Let's build your success story together.
                 </motion.p>
               </div>
               <motion.div
                 className="flex flex-col sm:flex-row gap-4 justify-center"
                 variants={fadeIn}
               >
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto bg-primary hover:bg-primary/90 uppercase-spaced"
-                  onClick={scrollToServices}
-                >
-                  EXPLORE SERVICES
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  asChild
-                  className="w-full sm:w-auto uppercase-spaced"
-                >
-                  <Link href="/resources">
-                    VIEW DIGITAL LIBRARY
-                    <Sparkles className="w-4 h-4 ml-2" />
-                  </Link>
-                </Button>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-primary hover:bg-primary/90 uppercase-spaced"
+                    onClick={scrollToServices}
+                  >
+                    EXPLORE SERVICES
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    asChild
+                    className="w-full sm:w-auto uppercase-spaced"
+                  >
+                    <Link href="/resources">
+                      VIEW DIGITAL LIBRARY
+                      <Sparkles className="w-4 h-4 ml-2" />
+                    </Link>
+                  </Button>
+                </motion.div>
               </motion.div>
             </motion.div>
           </div>
@@ -167,10 +198,15 @@ export default function HomePage() {
             className="text-center mb-16"
             variants={fadeIn}
           >
-            <p className="uppercase-spaced text-primary mb-4">OUR SERVICES</p>
-            <h2 className="text-4xl font-serif font-bold tracking-tight mb-4">Comprehensive Career Solutions</h2>
+            <motion.p 
+              className="uppercase-spaced text-primary mb-4"
+              variants={pulse}
+            >
+              OUR SERVICES
+            </motion.p>
+            <h2 className="text-4xl font-serif font-bold tracking-tight mb-4">Your Career Growth Partner</h2>
             <p className="text-muted-foreground max-w-[600px] mx-auto text-lg">
-              Choose the service that best fits your career development needs
+              Choose the service that best matches your career aspirations
             </p>
           </motion.div>
           <motion.div
@@ -180,7 +216,7 @@ export default function HomePage() {
             {/* CV Review Service */}
             <motion.div
               variants={fadeIn}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -5, scale: 1.02 }}
               transition={{ duration: 0.3 }}
               className="h-full"
             >
@@ -235,7 +271,7 @@ export default function HomePage() {
             {/* Digital Resources */}
             <motion.div
               variants={fadeIn}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -5, scale: 1.02 }}
               transition={{ duration: 0.3 }}
               className="h-full"
             >
@@ -281,7 +317,7 @@ export default function HomePage() {
             {/* Consultation */}
             <motion.div
               variants={fadeIn}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -5, scale: 1.02 }}
               transition={{ duration: 0.3 }}
               className="h-full"
             >
