@@ -237,6 +237,31 @@ export function registerRoutes(app: Express): Server {
         process.env.STRIPE_WEBHOOK_SECRET!
       );
     } catch (err) {
+
+
+  // Consultation request endpoint
+  app.post("/api/consultation-request", async (req, res) => {
+    try {
+      const { name, email, topics } = req.body;
+      
+      // Here you would typically:
+      // 1. Save the consultation request to your database
+      // 2. Send an email to the user with booking instructions
+      // 3. Send a notification to the admin
+      
+      // For now, we'll just log it
+      console.log('New consultation request:', { name, email, topics });
+      
+      // TODO: Implement email sending
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error processing consultation request:', error);
+      res.status(500).json({ error: 'Failed to process consultation request' });
+    }
+  });
+
+
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
