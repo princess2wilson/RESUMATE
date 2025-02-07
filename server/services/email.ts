@@ -25,5 +25,19 @@ export async function sendConsultationEmail(to: string, name: string) {
     `,
   };
 
-  return transporter.sendMail(message);
+  try {
+    const info = await transporter.sendMail(message);
+    console.log('Email sent successfully:', info);
+    return info;
+  } catch (error) {
+    console.error('SMTP Configuration:', {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      user: process.env.SMTP_USER,
+      from: process.env.SMTP_FROM,
+      // Not logging SMTP_PASS for security
+    });
+    console.error('Email sending failed:', error);
+    throw error;
+  }
 }
