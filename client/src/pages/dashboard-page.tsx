@@ -42,6 +42,9 @@ export default function DashboardPage() {
       formData.append("file", file);
       const response = await apiRequest("POST", "/api/cv-review", formData);
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Please log in again to upload your CV.');
+        }
         const errorData = await response.json().catch(() => ({ error: 'Upload failed' }));
         throw new Error(errorData.error || 'Failed to upload CV');
       }
@@ -61,8 +64,17 @@ export default function DashboardPage() {
         description: error.message,
         variant: "destructive",
       });
+      if (error.message.includes('Please log in again')) {
+        // Refresh the page to trigger re-authentication
+        window.location.reload();
+      }
     },
   });
+
+  // If user is not authenticated, we shouldn't show this page
+  if (!user) {
+    return null; // The ProtectedRoute component will handle the redirect
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
