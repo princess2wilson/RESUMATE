@@ -2,14 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles } from "lucide-react";
+import { BookOpen, Users, LogOut, ArrowRight, FileText, Sparkles, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, calculateDiscountedPrice } from "@/lib/currency";
-
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -287,6 +286,12 @@ export default function HomePage() {
               className="h-full"
             >
               <Card className="relative overflow-hidden border hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+                <div className="absolute top-4 right-4">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary">
+                    <Sparkles className="w-4 h-4 mr-1" />
+                    BOOK NOW
+                  </Badge>
+                </div>
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <Users className="w-6 h-6 text-primary" />
@@ -297,22 +302,40 @@ export default function HomePage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
+                  <div className="mb-6">
+                    <span className="text-2xl font-bold">
+                      {formatPrice(19900)}
+                    </span>
+                    <span className="text-sm text-muted-foreground"> / session</span>
+                  </div>
                   <ul className="space-y-3 text-sm text-muted-foreground mb-6 flex-1">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Career Strategy Session
+                    <li className="flex items-start gap-3">
+                      <Users className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Career Strategy Session</h3>
+                        <p>Personalized 1-hour session with industry expert</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Interview Preparation
+                    <li className="flex items-start gap-3">
+                      <FileText className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Interview Preparation</h3>
+                        <p>Mock interviews and feedback sessions</p>
+                      </div>
                     </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
-                      Mentoring Available
+                    <li className="flex items-start gap-3">
+                      <Star className="w-4 h-4 text-primary mt-1" />
+                      <div>
+                        <h3 className="font-medium text-foreground mb-1">Expert Mentoring</h3>
+                        <p>Guidance from experienced professionals</p>
+                      </div>
                     </li>
                   </ul>
                   <Button className="w-full bg-primary hover:bg-primary/90 uppercase-spaced mt-auto" asChild>
-                    <Link href="/consultations">BOOK NOW</Link>
+                    <Link href="/consultations">
+                      SCHEDULE CONSULTATION
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>

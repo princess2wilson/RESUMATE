@@ -211,10 +211,6 @@ export default function CVSubmissionPage() {
                         <div className="w-1.5 h-1.5 rounded-full bg-primary/70" />
                         First 10 submissions get 70% OFF!
                       </li>
-                      <li className="flex items-center gap-2 text-orange-600">
-                        <Clock className="w-3 h-3" />
-                        Unpaid submissions are automatically removed after 24 hours
-                      </li>
                     </ul>
                   </div>
 

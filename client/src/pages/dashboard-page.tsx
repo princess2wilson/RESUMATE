@@ -13,12 +13,24 @@ import {
 } from "@/components/ui/table";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { CVReview } from "@shared/schema";
-import { Upload, FileText, Check, Clock, ArrowRight } from "lucide-react";
+import { Upload, FileText, Check, Clock, ArrowRight, Lock } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+
+// Helper functions (add these)
+const formatPrice = (priceInCents: number): string => {
+  const priceInDollars = priceInCents / 100;
+  return `$${priceInDollars.toFixed(2)}`;
+};
+
+const calculateDiscountedPrice = (originalPrice: number, discountPercentage: number): number => {
+  const discountAmount = (originalPrice * discountPercentage) / 100;
+  return originalPrice - discountAmount;
+};
+
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -218,12 +230,12 @@ export default function DashboardPage() {
                           )}
                         </TableCell>
                         <TableCell className="space-x-2">
-                          <Button 
-                            onClick={() => setPreviewUrl(review.fileUrl)} 
-                            variant="link" 
+                          <Button
+                            onClick={() => setPreviewUrl(review.fileUrl)}
+                            variant="link"
                             size="sm"
                           >
-                            View Original
+                            View Original CV
                           </Button>
                           {review.status === "completed" && (
                             <Button
@@ -231,18 +243,29 @@ export default function DashboardPage() {
                                 if (!review.isPaid) {
                                   toast({
                                     title: "Payment Required",
-                                    description: "Please purchase access to view your reviewed CV",
-                                    variant: "destructive",
+                                    description: "Please complete the payment to access your professional CV review",
+                                    variant: "default",
                                   });
+                                  // TODO: Implement Stripe payment flow
                                   return;
                                 }
                                 setPreviewUrl(review.reviewedFileUrl);
                               }}
-                              variant="link"
+                              variant={review.isPaid ? "default" : "secondary"}
                               size="sm"
-                              className="text-primary"
+                              className={review.isPaid ? "bg-primary text-white hover:bg-primary/90" : ""}
                             >
-                              {review.isPaid ? "View Review" : "Purchase Review ($99)"}
+                              {review.isPaid ? (
+                                <>
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  View Review
+                                </>
+                              ) : (
+                                <>
+                                  <Lock className="w-4 h-4 mr-2" />
+                                  Unlock Review ({formatPrice(calculateDiscountedPrice(9900, 70))})
+                                </>
+                              )}
                             </Button>
                           )}
                         </TableCell>
@@ -265,15 +288,15 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex-1 p-4">
                   {previewUrl.toLowerCase().endsWith('.pdf') ? (
-                    <embed 
+                    <embed
                       src={window.location.origin + previewUrl}
                       type="application/pdf"
                       className="w-full h-full rounded border"
                     />
                   ) : (
-                    <iframe 
+                    <iframe
                       src={`https://docs.google.com/gview?url=${encodeURIComponent(window.location.origin + previewUrl)}&embedded=true`}
-                      title="CV Preview" 
+                      title="CV Preview"
                       className="w-full h-full rounded border"
                       frameBorder="0"
                     />
