@@ -22,7 +22,8 @@ export const cvReviews = pgTable("cv_reviews", {
   feedback: text("feedback"),
   createdAt: text("created_at").notNull(),
   isPromotional: boolean("is_promotional").notNull().default(false),
-  isPaid: boolean("is_paid").notNull().default(false), // Added isPaid column
+  isPaid: boolean("is_paid").notNull().default(false),
+  paymentDeadline: text("payment_deadline"),
 });
 
 export const insertUserSchema = createInsertSchema(users)
