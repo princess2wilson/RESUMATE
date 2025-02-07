@@ -23,7 +23,12 @@ export function ConsultationForm() {
     // Initialize Calendly after script loads
     script.onload = () => {
       if ((window as any).Calendly) {
-        const schedulingUrl = process.env.CALENDLY_SCHEDULING_URL;
+        const schedulingUrl = import.meta.env.VITE_CALENDLY_URL || process.env.CALENDLY_SCHEDULING_URL;
+        
+        if (!schedulingUrl) {
+          console.error('Calendly scheduling URL is not set');
+          return;
+        }
 
         (window as any).Calendly.initInlineWidget({
           url: schedulingUrl,
