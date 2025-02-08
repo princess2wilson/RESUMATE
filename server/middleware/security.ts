@@ -55,15 +55,15 @@ export const auditLogger = async (req: Request, res: Response, next: NextFunctio
 export const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'", "https://*.calendly.com", "https://calendly.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://*.calendly.com", "https://calendly.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://*.calendly.com", "https://assets.calendly.com", "https://calendly.com"],
-      imgSrc: ["'self'", "data:", "https:", "https://*.calendly.com", "https://calendly.com"],
-      connectSrc: ["'self'", "https://api.openai.com", "wss:", "ws:", "https://*.calendly.com", "https://calendly.com"],
-      fontSrc: ["'self'", "data:", "https:", "https://fonts.gstatic.com", "https://*.calendly.com", "https://calendly.com"],
+      defaultSrc: ["'self'", "https://*.calendly.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://*.calendly.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://*.calendly.com", "https://assets.calendly.com"],
+      imgSrc: ["'self'", "data:", "https:", "https://*.calendly.com"],
+      connectSrc: ["'self'", "https://api.openai.com", "wss:", "ws:", "https://*.calendly.com"],
+      fontSrc: ["'self'", "data:", "https:", "https://fonts.gstatic.com", "https://*.calendly.com"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'self'", "https://*.calendly.com", "https://calendly.com"],
+      frameSrc: ["'self'", "https://*.calendly.com"],
     },
   },
   crossOriginEmbedderPolicy: false, // Allow embedding of resources

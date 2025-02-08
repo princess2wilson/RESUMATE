@@ -1,114 +1,97 @@
-
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { Calendar } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-
-type ConsultationRequest = {
-  name: string;
-  email: string;
-  topics: string;
-};
+import { ErrorBoundary } from "./error-boundary";
 
 export function ConsultationForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ConsultationRequest>();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const onSubmit = async (data: ConsultationRequest) => {
-    setIsSubmitting(true);
-    setError(null);
-    
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     try {
-      const response = await fetch('/api/consultation-request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to submit request');
-      }
-      
-      setSuccess(true);
-      reset();
+      // Load Calendly widget script
+      const script = document.createElement('script');
+      script.src = "https://assets.calendly.com/assets/external/widget.js";
+      script.async = true;
+      scriptRef.current = script;
+
+      // Initialize Calendly after script loads
+      script.onload = () => {
+        if (!(window as any).Calendly) {
+          setError('Could not load the scheduling widget. Please refresh the page.');
+          setIsLoading(false);
+          return;
+        }
+
+        const parentElement = document.querySelector('.calendly-inline-widget');
+        if (!parentElement) {
+          setError('Could not initialize the booking widget. Please refresh the page.');
+          setIsLoading(false);
+          return;
+        }
+
+        try {
+          (window as any).Calendly.initInlineWidget({
+            url: 'https://calendly.com/resumate/career-consultation',
+            parentElement,
+            prefill: {},
+            utm: {},
+          });
+          setIsLoading(false);
+        } catch (err) {
+          console.error('Failed to initialize Calendly:', err);
+          setError('Could not initialize the booking widget. Please try again later.');
+          setIsLoading(false);
+        }
+      };
+
+      script.onerror = () => {
+        setError('Failed to load the scheduling widget. Please check your internet connection.');
+        setIsLoading(false);
+      };
+
+      // Add script to document
+      document.body.appendChild(script);
     } catch (err) {
-      setError('Failed to submit consultation request. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error setting up Calendly:', err);
+      setError('Something went wrong. Please try again later.');
+      setIsLoading(false);
     }
-  };
 
-  if (success) {
-    return (
-      <Card className="p-6">
-        <h3 className="text-xl font-semibold mb-4 text-center">Request Submitted!</h3>
-        <p className="text-center text-muted-foreground">
-          Thank you for your interest. We'll send you an email shortly with instructions to schedule your consultation.
-        </p>
-      </Card>
-    );
-  }
+    return () => {
+      // Cleanup: remove script only if it's still in document
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        document.body.removeChild(scriptRef.current);
+      }
+    };
+  }, []);
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+  const content = (
+    <div className="relative">
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      
-      <div>
-        <Input
-          placeholder="Your Name"
-          {...register("name", { required: "Name is required" })}
-        />
-        {errors.name && (
-          <p className="text-sm text-red-500 mt-1">{errors.name.message}</p>
-        )}
-      </div>
-      
-      <div>
-        <Input
-          type="email"
-          placeholder="Email Address"
-          {...register("email", { 
-            required: "Email is required",
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: "Invalid email address"
-            }
-          })}
-        />
-        {errors.email && (
-          <p className="text-sm text-red-500 mt-1">{errors.email.message}</p>
-        )}
-      </div>
-      
-      <div>
-        <Textarea
-          placeholder="What topics would you like to discuss?"
-          {...register("topics", { required: "Please describe your topics" })}
-          rows={4}
-        />
-        {errors.topics && (
-          <p className="text-sm text-red-500 mt-1">{errors.topics.message}</p>
-        )}
-      </div>
-      
-      <Button 
-        type="submit" 
-        className="w-full"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? "Submitting..." : "Request Consultation"}
-      </Button>
-    </form>
+      <div 
+        className="calendly-inline-widget" 
+        style={{ minWidth: '320px', height: '700px' }} 
+      />
+      {/* Loading state */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+          <div className="text-center">
+            <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
+            <p className="text-lg font-medium">Loading calendar...</p>
+            <p className="text-sm text-muted-foreground">Please wait while we set up your booking experience</p>
+          </div>
+        </div>
+      )}
+    </div>
   );
+
+  return <ErrorBoundary>{content}</ErrorBoundary>;
 }

@@ -237,43 +237,6 @@ export function registerRoutes(app: Express): Server {
         process.env.STRIPE_WEBHOOK_SECRET!
       );
     } catch (err) {
-
-
-  // Rate limiter for consultation requests - max 2 per IP per year
-  const consultationLimiter = rateLimit({
-    windowMs: 365 * 24 * 60 * 60 * 1000, // 1 year window
-    max: 2, // Limit each IP to 2 requests per window
-    message: { error: "You have reached the maximum number of consultation requests for this year." },
-    standardHeaders: true,
-    legacyHeaders: false,
-    trustProxy: true // Trust X-Forwarded-For header
-  });
-
-  // Consultation request endpoint
-  app.post("/api/consultation-request", consultationLimiter, async (req, res) => {
-    try {
-      const { name, email, topics } = req.body;
-      
-      // Here you would typically:
-      // 1. Save the consultation request to your database
-      // 2. Send an email to the user with booking instructions
-      // 3. Send a notification to the admin
-      
-      // Send email with Calendly link
-      try {
-        await sendConsultationEmail(email, name);
-        res.json({ success: true });
-      } catch (emailError) {
-        console.error('Email sending failed:', emailError);
-        res.status(500).json({ error: 'Failed to send confirmation email' });
-      }
-    } catch (error) {
-      console.error('Error processing consultation request:', error);
-      res.status(500).json({ error: 'Failed to process consultation request' });
-    }
-  });
-
-
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
