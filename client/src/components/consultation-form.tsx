@@ -11,6 +11,48 @@ export function ConsultationForm() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const initializeCalendly = () => {
+      try {
+        const parentElement = document.querySelector('.calendly-inline-widget');
+        if (!parentElement) {
+          console.error('Calendly parent element not found');
+          setError('Could not initialize the booking widget. Please refresh the page.');
+          setIsLoading(false);
+          return;
+        }
+
+        if (!(window as any).Calendly) {
+          console.error('Calendly not loaded');
+          setError('Could not load the scheduling widget. Please refresh the page.');
+          setIsLoading(false);
+          return;
+        }
+
+        // Ensure the Calendly object is fully loaded
+        setTimeout(() => {
+          try {
+            console.log('Initializing Calendly widget...');
+            (window as any).Calendly.initInlineWidget({
+              url: 'https://calendly.com/resumate/career-consultation',
+              parentElement,
+              prefill: {},
+              utm: {}
+            });
+            console.log('Calendly widget initialized successfully');
+            setIsLoading(false);
+          } catch (err) {
+            console.error('Error initializing Calendly widget:', err);
+            setError('Could not initialize the booking widget. Please try again later.');
+            setIsLoading(false);
+          }
+        }, 1000); // Add a small delay to ensure everything is loaded
+      } catch (err) {
+        console.error('Error in Calendly initialization:', err);
+        setError('Something went wrong. Please try again later.');
+        setIsLoading(false);
+      }
+    };
+
     try {
       // Load Calendly widget script
       const script = document.createElement('script');
@@ -20,35 +62,12 @@ export function ConsultationForm() {
 
       // Initialize Calendly after script loads
       script.onload = () => {
-        if (!(window as any).Calendly) {
-          setError('Could not load the scheduling widget. Please refresh the page.');
-          setIsLoading(false);
-          return;
-        }
-
-        const parentElement = document.querySelector('.calendly-inline-widget');
-        if (!parentElement) {
-          setError('Could not initialize the booking widget. Please refresh the page.');
-          setIsLoading(false);
-          return;
-        }
-
-        try {
-          (window as any).Calendly.initInlineWidget({
-            url: 'https://calendly.com/resumate/career-consultation',
-            parentElement,
-            prefill: {},
-            utm: {},
-          });
-          setIsLoading(false);
-        } catch (err) {
-          console.error('Failed to initialize Calendly:', err);
-          setError('Could not initialize the booking widget. Please try again later.');
-          setIsLoading(false);
-        }
+        console.log('Calendly script loaded');
+        initializeCalendly();
       };
 
-      script.onerror = () => {
+      script.onerror = (e) => {
+        console.error('Failed to load Calendly script:', e);
         setError('Failed to load the scheduling widget. Please check your internet connection.');
         setIsLoading(false);
       };
