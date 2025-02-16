@@ -56,12 +56,45 @@ export function registerRoutes(app: Express): Server {
 
   setupAuth(app);
 
-  // Serve uploaded files with CORS headers
+  // Configure uploads directory for static file serving with proper headers
+  const uploadsPath = path.join(process.cwd(), 'uploads');
+
+  // Create uploads directory if it doesn't exist
+  if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+  }
+
+  // Serve uploaded files with proper headers
   app.use('/uploads', (req, res, next) => {
+    // Set security headers for file downloads
     res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Range');
+    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.header('Content-Security-Policy', "default-src 'self' 'unsafe-inline' data: blob:");
+    res.header('X-Content-Type-Options', 'nosniff');
+
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+
     next();
-  }, express.static(path.join(process.cwd(), 'uploads')));
+  }, express.static(path.join(process.cwd(), 'uploads'), {
+    setHeaders: (res, filePath) => {
+      // Set appropriate content type and disposition based on file type
+      if (filePath.endsWith('.pdf')) {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'inline');
+      } else if (filePath.endsWith('.doc') || filePath.endsWith('.docx')) {
+        res.setHeader('Content-Type', 'application/msword');
+        res.setHeader('Content-Disposition', 'inline');
+      } else if (filePath.endsWith('.txt')) {
+        res.setHeader('Content-Type', 'text/plain');
+        res.setHeader('Content-Disposition', 'inline');
+      }
+    }
+  }));
 
   // Add this new route to help with OAuth configuration
   app.get("/api/auth/config", (req, res) => {
