@@ -106,7 +106,7 @@ export default function AdminPage() {
                     </TableCell>
                     <TableCell>{review.userId}</TableCell>
                     <TableCell>
-                      <Badge variant={review.status === "completed" ? "success" : "secondary"}>
+                      <Badge variant={review.status === "completed" ? "default" : "secondary"}>
                         {review.status === "completed" ? (
                           <CheckCircle className="w-3 h-3 mr-1" />
                         ) : (
