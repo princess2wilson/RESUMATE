@@ -4,38 +4,23 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import multer from "multer";
 import express from "express";
-import { insertCVReviewSchema } from "@shared/schema";
-import Stripe from "stripe";
-import mammoth from 'mammoth';
+import path from 'path';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
-import path from 'path';
 
 const upload = multer({ dest: "uploads/" });
 
-// Helper to convert DOCX to HTML
-async function convertDocToHtml(filePath: string): Promise<string> {
-  try {
-    const result = await mammoth.convertToHtml({path: filePath});
-    return result.value;
-  } catch (error) {
-    console.error('Error converting doc:', error);
-    throw error;
-  }
+// Helper to check if file exists and is accessible
+function fileExists(filePath: string): Promise<boolean> {
+  return new Promise(resolve => {
+    fs.access(filePath, fs.constants.F_OK, err => resolve(!err));
+  });
 }
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is required");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
-});
 
 export function registerRoutes(app: Express): Server {
-  // Configure trust proxy for production environment behind Replit's proxy
+  // Configure trust proxy for production environment
   if (app.get('env') === 'production') {
-    app.set('trust proxy', 1); // More specific trust proxy configuration
+    app.set('trust proxy', 1);
   }
 
   // Configure rate limiting
@@ -56,73 +41,73 @@ export function registerRoutes(app: Express): Server {
 
   setupAuth(app);
 
-  // Configure uploads directory for static file serving with proper headers
-  const uploadsPath = path.join(process.cwd(), 'uploads');
+  // Configure uploads directory
+  const uploadsPath = path.resolve(process.cwd(), 'uploads');
+  console.log('Uploads directory path:', uploadsPath);
 
   // Create uploads directory if it doesn't exist
   if (!fs.existsSync(uploadsPath)) {
     fs.mkdirSync(uploadsPath, { recursive: true });
+    console.log('Created uploads directory');
   }
 
   // Serve uploaded files with proper headers
-  app.use('/uploads', (req, res, next) => {
-    // Set security headers for file downloads
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Range');
-    res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.header('Content-Security-Policy', "default-src 'self' 'unsafe-inline' data: blob:");
-    res.header('X-Content-Type-Options', 'nosniff');
+  app.use('/uploads', async (req, res, next) => {
+    try {
+      const requestedFile = path.join(uploadsPath, path.basename(req.path));
+      console.log('Requested file path:', requestedFile);
 
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-
-    next();
-  }, express.static(path.join(process.cwd(), 'uploads'), {
-    setHeaders: (res, filePath) => {
-      // Set appropriate content type and disposition based on file type
-      if (filePath.endsWith('.pdf')) {
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'inline');
-      } else if (filePath.endsWith('.doc') || filePath.endsWith('.docx')) {
-        res.setHeader('Content-Type', 'application/msword');
-        res.setHeader('Content-Disposition', 'inline');
-      } else if (filePath.endsWith('.txt')) {
-        res.setHeader('Content-Type', 'text/plain');
-        res.setHeader('Content-Disposition', 'inline');
+      // Check if file exists
+      const exists = await fileExists(requestedFile);
+      if (!exists) {
+        console.error('File not found:', requestedFile);
+        return res.status(404).send('File not found');
       }
-    }
-  }));
 
-  // Add this new route to help with OAuth configuration
-  app.get("/api/auth/config", (req, res) => {
-    const domain = 'https://d3f2dcce-f667-40d9-9996-81817805ae6a-00-3av40ax91wgqg.picard.replit.dev';
+      // Set security headers
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Range');
+      res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.header('Content-Security-Policy', "default-src 'self' 'unsafe-inline' data: blob:");
+      res.header('X-Content-Type-Options', 'nosniff');
 
-    res.json({
-      google: {
-        redirectUrl: `${domain}/api/auth/google/callback`,
-        instructions: [
-          "1. Go to Google Cloud Console (https://console.cloud.google.com)",
-          "2. Select your project",
-          "3. Go to APIs & Services > OAuth Consent Screen",
-          "4. Add your app name and authorized domain",
-          "5. Go to Credentials > OAuth 2.0 Client IDs",
-          "6. Add the redirect URI listed above",
-          "7. Make sure to add the domain to authorized domains"
-        ]
-      },
-      linkedin: {
-        redirectUrl: `${domain}/api/auth/linkedin/callback`,
-        instructions: [
-          "1. Go to LinkedIn Developer Console",
-          "2. Select your app",
-          "3. Go to Auth > OAuth 2.0 settings",
-          "4. Add the redirect URI listed above"
-        ]
+      // Handle preflight requests
+      if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
       }
-    });
+
+      // Set content type based on file extension
+      const ext = path.extname(requestedFile).toLowerCase();
+      switch (ext) {
+        case '.pdf':
+          res.setHeader('Content-Type', 'application/pdf');
+          break;
+        case '.doc':
+        case '.docx':
+          res.setHeader('Content-Type', 'application/msword');
+          break;
+        case '.txt':
+          res.setHeader('Content-Type', 'text/plain');
+          break;
+        default:
+          res.setHeader('Content-Type', 'application/octet-stream');
+      }
+
+      res.setHeader('Content-Disposition', 'inline');
+
+      // Stream the file
+      const stream = fs.createReadStream(requestedFile);
+      stream.on('error', (error) => {
+        console.error('Error streaming file:', error);
+        res.status(500).send('Error streaming file');
+      });
+      stream.pipe(res);
+
+    } catch (error) {
+      console.error('Error serving file:', error);
+      next(error);
+    }
   });
 
   // CV Review routes (require authentication)
@@ -152,7 +137,9 @@ export function registerRoutes(app: Express): Server {
           status: "pending",
           feedback: null,
           createdAt: new Date().toISOString(),
-          isPromotional: false
+          isPromotional: false,
+          reviewedFileUrl: null,
+          isPaid: false
         });
         res.json(review);
       } catch (error) {
@@ -160,76 +147,6 @@ export function registerRoutes(app: Express): Server {
         res.status(500).json({ error: 'Failed to create CV review' });
       }
     });
-  });
-
-  // Product routes (no auth required)
-  app.get("/api/products", async (_req, res) => {
-    try {
-      const products = await storage.getProducts();
-      res.json(products);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).json({ error: 'Failed to fetch products' });
-    }
-  });
-
-  // Stripe checkout (no auth required)
-  app.post("/api/create-checkout-session", async (req, res) => {
-    try {
-      const { productId } = req.body;
-      const product = await storage.getProduct(productId);
-
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-
-      // Create Stripe Product if it doesn't exist
-      let stripeProduct = product.stripeProductId;
-      let stripePrice = product.stripePriceId;
-
-      if (!stripeProduct || !stripePrice) {
-        const newStripeProduct = await stripe.products.create({
-          name: product.name,
-          description: product.description,
-        });
-
-        const newStripePrice = await stripe.prices.create({
-          product: newStripeProduct.id,
-          unit_amount: product.price,
-          currency: 'usd',
-        });
-
-        // Update product with Stripe IDs
-        await storage.updateProduct(product.id, {
-          stripeProductId: newStripeProduct.id,
-          stripePriceId: newStripePrice.id,
-        });
-
-        stripeProduct = newStripeProduct.id;
-        stripePrice = newStripePrice.id;
-      }
-
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price: stripePrice,
-            quantity: 1,
-          },
-        ],
-        mode: "payment",
-        success_url: `${req.protocol}://${req.get("host")}/resources?success=true`,
-        cancel_url: `${req.protocol}://${req.get("host")}/resources?canceled=true`,
-      });
-
-      res.json({ url: session.url });
-    } catch (error) {
-      console.error('Error creating checkout session:', error);
-      res.status(500).json({
-        error: 'Failed to create checkout session',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
   });
 
   app.get("/api/cv-reviews", async (req, res) => {
@@ -252,58 +169,6 @@ export function registerRoutes(app: Express): Server {
     );
     res.json(review);
   });
-
-  app.get("/api/subscription", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    const subscription = await storage.getSubscription(req.user.id);
-    res.json(subscription);
-  });
-
-  app.post("/api/webhooks", async (req, res) => {
-    const sig = req.headers["stripe-signature"];
-    let event;
-
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.body,
-        sig!,
-        process.env.STRIPE_WEBHOOK_SECRET!
-      );
-    } catch (err) {
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object;
-        const subscription = await stripe.subscriptions.retrieve(
-          session.subscription as string
-        );
-
-        await storage.createSubscription({
-          userId: parseInt(session.metadata.userId),
-          stripeCustomerId: session.customer as string,
-          stripeSubscriptionId: subscription.id,
-          status: subscription.status,
-          planType: session.metadata.planType,
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
-        });
-        break;
-      }
-      case "customer.subscription.updated":
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object;
-        await storage.updateSubscription(subscription.id, {
-          status: subscription.status,
-          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
-        });
-        break;
-      }
-    }
-
-    res.json({ received: true });
-  });
-
 
   const httpServer = createServer(app);
   return httpServer;
