@@ -95,15 +95,15 @@ export function ConsultationForm() {
       if (initializeTimeout) {
         clearTimeout(initializeTimeout);
       }
-      // Only remove the script if we created it
-      if (scriptRef.current && document.body.contains(scriptRef.current)) {
-        document.body.removeChild(scriptRef.current);
-      }
       // Clean up Calendly
       if (calendarRef.current) {
         while (calendarRef.current.firstChild) {
           calendarRef.current.removeChild(calendarRef.current.firstChild);
         }
+      }
+      // Only remove the script if we created it
+      if (scriptRef.current && document.body.contains(scriptRef.current)) {
+        document.body.removeChild(scriptRef.current);
       }
     };
   }, []); // Empty dependency array to run only once
@@ -111,7 +111,7 @@ export function ConsultationForm() {
   const content = (
     <div className="relative">
       {error && (
-        <Alert variant="destructive" className="mb-4">
+        <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
