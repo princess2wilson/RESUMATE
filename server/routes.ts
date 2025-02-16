@@ -8,14 +8,16 @@ import path from 'path';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 
-// Configure multer to store files with their original names
-const uploadsPath = path.resolve(process.cwd(), 'uploads');
+// Configure multer to store files in the uploads directory
+const uploadsPath = path.join(process.cwd(), 'uploads');
+
+// Ensure uploads directory exists
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+
 const storage_config = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Ensure uploads directory exists
-    if (!fs.existsSync(uploadsPath)) {
-      fs.mkdirSync(uploadsPath, { recursive: true });
-    }
     cb(null, uploadsPath);
   },
   filename: function (req, file, cb) {
@@ -93,6 +95,13 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
+      console.log('File upload successful:', {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        path: req.file.path,
+        destination: req.file.destination
+      });
+
       try {
         const review = await storage.createCVReview({
           userId: req.user.id,
@@ -133,6 +142,7 @@ export function registerRoutes(app: Express): Server {
     res.json(review);
   });
 
+  // Handle file downloads
   app.get("/api/cv-reviews/download/:filename", authenticatedLimiter, (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
@@ -141,10 +151,11 @@ export function registerRoutes(app: Express): Server {
     const filename = req.params.filename;
     const filePath = path.join(uploadsPath, filename);
 
-    console.log('Attempting to download file:', {
-      requestedFile: filename,
-      fullPath: filePath,
-      exists: fs.existsSync(filePath)
+    console.log('File download request:', {
+      filename,
+      filePath,
+      exists: fs.existsSync(filePath),
+      uploadsPath
     });
 
     // Check if file exists
@@ -153,13 +164,25 @@ export function registerRoutes(app: Express): Server {
       return res.status(404).json({ error: "File not found" });
     }
 
-    res.download(filePath, filename, (err) => {
-      if (err) {
-        console.error('Error downloading file:', err);
-        // Only send error response if headers haven't been sent yet
-        if (!res.headersSent) {
-          res.status(500).json({ error: "Error downloading file" });
-        }
+    // Set Content-Type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    const contentType = {
+      '.pdf': 'application/pdf',
+      '.doc': 'application/msword',
+      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    }[ext] || 'application/octet-stream';
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+
+    // Stream the file
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+    fileStream.on('error', (err) => {
+      console.error('Error streaming file:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: "Error streaming file" });
       }
     });
   });
