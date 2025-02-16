@@ -82,6 +82,17 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
+  // Product routes (no auth required)
+  app.get("/api/products", async (_req, res) => {
+    try {
+      const products = await storage.getProducts();
+      res.json(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Failed to fetch products' });
+    }
+  });
+
   app.get("/api/cv-reviews", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const reviews = await storage.getCVReviews(req.user.id);
