@@ -11,6 +11,7 @@ export function ConsultationForm() {
 
   useEffect(() => {
     const calendlyUrl = import.meta.env.VITE_CALENDLY_URL;
+    console.log('Calendly URL:', calendlyUrl); // Debug log
 
     if (!calendlyUrl) {
       setError('Calendly URL is not configured');
@@ -26,6 +27,7 @@ export function ConsultationForm() {
 
       try {
         const Calendly = (window as any).Calendly;
+
         if (!Calendly) {
           console.error('Calendly not found in window object');
           setError('Could not initialize the scheduling widget. Please refresh the page.');
@@ -42,11 +44,16 @@ export function ConsultationForm() {
 
         console.log('Initializing Calendly widget with URL:', calendlyUrl);
 
+        // Clear any existing widgets
+        if (calendarRef.current.firstChild) {
+          calendarRef.current.innerHTML = '';
+        }
+
         Calendly.initInlineWidget({
           url: calendlyUrl,
           parentElement: calendarRef.current,
           prefill: {},
-          utm: {}
+          utm: {},
         });
 
         setIsLoading(false);
@@ -59,7 +66,7 @@ export function ConsultationForm() {
     };
 
     const loadScript = () => {
-      if (isScriptLoaded) return;
+      if (isScriptLoaded || !isMounted) return;
 
       const script = document.createElement('script');
       script.src = 'https://assets.calendly.com/assets/external/widget.js';
@@ -67,7 +74,7 @@ export function ConsultationForm() {
       script.onload = () => {
         console.log('Calendly script loaded successfully');
         isScriptLoaded = true;
-        // Add a small delay to ensure Calendly is fully initialized
+        // Wait for DOM and script to be fully ready
         setTimeout(initializeCalendly, 1000);
       };
       script.onerror = (e) => {
@@ -82,13 +89,20 @@ export function ConsultationForm() {
       scriptRef.current = script;
     };
 
-    loadScript();
+    // Ensure DOM is ready before loading script
+    if (document.readyState === 'complete') {
+      loadScript();
+    } else {
+      window.addEventListener('load', loadScript);
+    }
 
     return () => {
       isMounted = false;
       if (scriptRef.current && document.body.contains(scriptRef.current)) {
         document.body.removeChild(scriptRef.current);
       }
+      // Clean up load event listener
+      window.removeEventListener('load', loadScript);
     };
   }, []);
 
@@ -102,6 +116,7 @@ export function ConsultationForm() {
       <div 
         ref={calendarRef}
         style={{ minWidth: '320px', height: '700px' }} 
+        className="calendly-inline-widget" // Add back the class for styling
       />
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
