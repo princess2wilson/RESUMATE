@@ -14,14 +14,24 @@ import ConsultationPage from "@/pages/consultation-page";
 import CVSubmissionPage from "@/pages/cv-submission-page";
 import { ProtectedRoute } from "./lib/protected-route";
 
-function Router() {
+// Separate router for admin routes
+function AdminRouter() {
+  return (
+    <Switch>
+      <Route path="/admin/login" component={AdminLoginPage} />
+      <ProtectedRoute path="/admin" component={AdminPage} adminOnly />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+// Main application router
+function MainRouter() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
-      <Route path="/admin/login" component={AdminLoginPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
-      <ProtectedRoute path="/admin" component={AdminPage} adminOnly />
       <Route path="/resources" component={ResourceLibraryPage} />
       <Route path="/consultations" component={ConsultationPage} />
       <ProtectedRoute path="/cv-submission" component={CVSubmissionPage} />
@@ -31,10 +41,13 @@ function Router() {
 }
 
 function App() {
+  // Check if the current path is an admin route
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router />
+        {isAdminRoute ? <AdminRouter /> : <MainRouter />}
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>

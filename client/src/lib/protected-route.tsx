@@ -23,20 +23,24 @@ export function ProtectedRoute({
     );
   }
 
-  if (!user) {
-    return (
-      <Route path={path}>
-        <Redirect to={adminOnly ? "/admin/login" : "/auth"} />
-      </Route>
-    );
-  }
-
-  if (adminOnly && !user.isAdmin) {
-    return (
-      <Route path={path}>
-        <Redirect to="/admin/login" />
-      </Route>
-    );
+  // For admin routes, redirect to admin login if not authenticated or not an admin
+  if (adminOnly) {
+    if (!user || !user.isAdmin) {
+      return (
+        <Route path={path}>
+          <Redirect to="/admin/login" />
+        </Route>
+      );
+    }
+  } else {
+    // For regular protected routes, redirect to auth if not authenticated
+    if (!user) {
+      return (
+        <Route path={path}>
+          <Redirect to="/auth" />
+        </Route>
+      );
+    }
   }
 
   return <Route path={path} component={Component} />;
