@@ -244,26 +244,24 @@ export default function AdminPage() {
                             variant="link" 
                             asChild 
                             className="p-0"
-                            onClick={() => {
-                              // Create full URL for the file
-                              const fileUrl = `/api/cv-reviews/download/${review.fileUrl}`;
+                            onClick={async () => {
+                              try {
+                                // Show loading toast
+                                toast({
+                                  title: "Opening CV",
+                                  description: "Opening the CV in a new window...",
+                                });
 
-                              // Create a temporary link element
-                              const link = document.createElement('a');
-                              link.href = fileUrl;
-                              link.target = '_blank';
-                              link.download = review.fileUrl.split('-').slice(1).join('-'); // Remove timestamp prefix
-
-                              // Append to body, click, and remove
-                              document.body.appendChild(link);
-                              link.click();
-                              document.body.removeChild(link);
-
-                              // Show loading toast
-                              toast({
-                                title: "Downloading CV",
-                                description: "Your download should begin shortly...",
-                              });
+                                // Open in new window
+                                window.open(`/api/cv-reviews/download/${review.fileUrl}`, '_blank');
+                              } catch (error) {
+                                console.error('Error opening file:', error);
+                                toast({
+                                  title: "Error",
+                                  description: "There was an error opening the file. Please try again.",
+                                  variant: "destructive"
+                                });
+                              }
                             }}
                           >
                             <div className="flex items-center gap-1">
