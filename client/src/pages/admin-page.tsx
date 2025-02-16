@@ -243,7 +243,7 @@ export default function AdminPage() {
                           <Button
                             variant="link"
                             className="p-0"
-                            onClick={async () => {
+                            onClick={() => {
                               try {
                                 // Show loading toast
                                 toast({
@@ -251,13 +251,8 @@ export default function AdminPage() {
                                   description: "Starting download...",
                                 });
 
-                                // Create a temporary link element
-                                const link = document.createElement('a');
-                                link.href = `/api/cv-reviews/download/${review.fileUrl}`;
-                                link.download = review.fileUrl; // This will force download
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
+                                // Directly navigate to download URL
+                                window.location.href = `/api/cv-reviews/download/${review.fileUrl}`;
 
                                 toast({
                                   title: "Download Started",

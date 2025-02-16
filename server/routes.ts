@@ -164,18 +164,13 @@ export function registerRoutes(app: Express): Server {
       return res.status(404).json({ error: "File not found" });
     }
 
-    // Set headers for download
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-
-    // Stream the file
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-
-    fileStream.on('error', (err) => {
-      console.error('Error streaming file:', err);
-      if (!res.headersSent) {
-        res.status(500).json({ error: "Error streaming file" });
+    // Use res.download to properly send the file
+    res.download(filePath, filename, (err) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        if (!res.headersSent) {
+          res.status(500).json({ error: "Error downloading file" });
+        }
       }
     });
   });
