@@ -8,7 +8,7 @@ import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AdminPage from "@/pages/admin-page";
-import AdminLoginPage from "@/pages/admin-login-page";
+import AdminLoginPage from "./pages/admin-login-page";
 import ResourceLibraryPage from "@/pages/resource-library-page";
 import ConsultationPage from "@/pages/consultation-page";
 import CVSubmissionPage from "@/pages/cv-submission-page";
