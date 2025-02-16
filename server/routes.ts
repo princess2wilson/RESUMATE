@@ -14,16 +14,23 @@ const uploadsPath = path.join(process.cwd(), 'uploads');
 // Ensure uploads directory exists
 if (!fs.existsSync(uploadsPath)) {
   fs.mkdirSync(uploadsPath, { recursive: true });
+  console.log('Created uploads directory at:', uploadsPath);
 }
 
 const storage_config = multer.diskStorage({
   destination: function (req, file, cb) {
+    // Log the upload destination
+    console.log('Upload destination:', uploadsPath);
     cb(null, uploadsPath);
   },
   filename: function (req, file, cb) {
-    // Keep the original filename but make it URL safe
-    const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-    cb(null, Date.now() + '-' + safeName);
+    // Generate a timestamp-based filename to avoid conflicts
+    const timestamp = Date.now();
+    // Keep the original extension but remove any potentially problematic characters
+    const ext = path.extname(file.originalname);
+    const safeName = `${timestamp}${ext}`;
+    console.log('Generated filename:', safeName, 'from original:', file.originalname);
+    cb(null, safeName);
   }
 });
 
@@ -99,13 +106,14 @@ export function registerRoutes(app: Express): Server {
         filename: req.file.filename,
         originalname: req.file.originalname,
         path: req.file.path,
-        destination: req.file.destination
+        destination: req.file.destination,
+        fullPath: path.join(req.file.destination, req.file.filename)
       });
 
       try {
         const review = await storage.createCVReview({
           userId: req.user.id,
-          fileUrl: req.file.filename,
+          fileUrl: req.file.filename, // Store only the filename
           status: "pending",
           feedback: null,
           createdAt: new Date().toISOString(),
@@ -155,7 +163,8 @@ export function registerRoutes(app: Express): Server {
       filename,
       filePath,
       exists: fs.existsSync(filePath),
-      uploadsPath
+      uploadsPath,
+      currentDirectory: process.cwd()
     });
 
     // Check if file exists
