@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import {
@@ -64,17 +63,17 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-primary/10">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-2 mb-2">
             <Shield className="w-6 h-6 text-primary" />
             <CardTitle className="text-2xl font-bold tracking-tight">
-              Administrator Access
+              Admin Access
             </CardTitle>
           </div>
           <CardDescription>
-            Secure login portal for Resumate administrators.
+            Secure login portal for system administrators.
           </CardDescription>
         </CardHeader>
         <CardContent>
