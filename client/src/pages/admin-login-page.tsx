@@ -97,7 +97,7 @@ export default function AdminLoginPage() {
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="admin@resumate.com"
+                        placeholder="Enter your admin email"
                         {...field}
                         disabled={loginMutation.isPending}
                         className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
@@ -117,7 +117,7 @@ export default function AdminLoginPage() {
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Enter your admin password"
+                        placeholder="Enter your password"
                         {...field}
                         disabled={loginMutation.isPending}
                         className="focus:ring-2 focus:ring-primary transition-shadow duration-200"
