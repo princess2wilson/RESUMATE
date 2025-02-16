@@ -240,25 +240,34 @@ export default function AdminPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button 
-                            variant="link" 
-                            asChild 
+                          <Button
+                            variant="link"
                             className="p-0"
                             onClick={async () => {
                               try {
                                 // Show loading toast
                                 toast({
-                                  title: "Opening CV",
-                                  description: "Opening the CV in a new window...",
+                                  title: "Downloading CV",
+                                  description: "Starting download...",
                                 });
 
-                                // Open in new window
-                                window.open(`/api/cv-reviews/download/${review.fileUrl}`, '_blank');
-                              } catch (error) {
-                                console.error('Error opening file:', error);
+                                // Create a temporary link element
+                                const link = document.createElement('a');
+                                link.href = `/api/cv-reviews/download/${review.fileUrl}`;
+                                link.download = review.fileUrl; // This will force download
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+
                                 toast({
-                                  title: "Error",
-                                  description: "There was an error opening the file. Please try again.",
+                                  title: "Download Started",
+                                  description: "Your CV file download has started.",
+                                });
+                              } catch (error) {
+                                console.error('Error downloading file:', error);
+                                toast({
+                                  title: "Download Failed",
+                                  description: "There was an error downloading the file. Please try again.",
                                   variant: "destructive"
                                 });
                               }
@@ -266,7 +275,7 @@ export default function AdminPage() {
                           >
                             <div className="flex items-center gap-1">
                               <FileText className="w-4 h-4" />
-                              View CV
+                              Download CV
                             </div>
                           </Button>
                         </TableCell>

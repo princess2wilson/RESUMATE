@@ -164,16 +164,9 @@ export function registerRoutes(app: Express): Server {
       return res.status(404).json({ error: "File not found" });
     }
 
-    // Set Content-Type based on file extension
-    const ext = path.extname(filename).toLowerCase();
-    const contentType = {
-      '.pdf': 'application/pdf',
-      '.doc': 'application/msword',
-      '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    }[ext] || 'application/octet-stream';
-
-    res.setHeader('Content-Type', contentType);
-    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    // Set headers for download
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
     // Stream the file
     const fileStream = fs.createReadStream(filePath);
