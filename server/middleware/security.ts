@@ -19,8 +19,32 @@ export const apiLimiter = rateLimit({
   message: { error: 'Too many requests, please try again later' },
   standardHeaders: true,
   legacyHeaders: false,
-  trustProxy: false
+  trustProxy: false,
+  skip: (req) => req.path.startsWith('/api/health'),
+  keyGenerator: (req) => {
+    // Use both IP and user ID if available for better rate limiting
+    return req.user?.id ? `${req.ip}-${req.user.id}` : req.ip;
+  },
+  handler: (req, res) => {
+    res.status(429).json({
+      error: 'Rate limit exceeded',
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
+    });
+  }
 })
+
+// Add bot protection middleware
+export const botProtection = (req: Request, res: Response, next: NextFunction) => {
+  const userAgent = req.get('user-agent') || '';
+  const suspicious = !userAgent || 
+                    userAgent.toLowerCase().includes('bot') ||
+                    userAgent.toLowerCase().includes('crawler');
+                    
+  if (suspicious && !req.path.startsWith('/api/health')) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  next();
+};
 
 // Audit logging middleware
 export const auditLogger = async (req: Request, res: Response, next: NextFunction) => {
