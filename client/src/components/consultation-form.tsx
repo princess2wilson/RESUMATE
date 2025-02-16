@@ -11,6 +11,7 @@ export function ConsultationForm() {
 
   useEffect(() => {
     const calendlyUrl = import.meta.env.VITE_CALENDLY_URL;
+    console.log('Calendly URL:', calendlyUrl); // Debug log
 
     if (!calendlyUrl) {
       setError('Calendly URL is not configured');
@@ -18,14 +19,15 @@ export function ConsultationForm() {
       return;
     }
 
-    let isScriptLoaded = false;
     let isMounted = true;
+    let initializeTimeout: NodeJS.Timeout;
 
     const initializeCalendly = () => {
       if (!isMounted) return;
 
       try {
         const Calendly = (window as any).Calendly;
+
         if (!Calendly) {
           console.error('Calendly not found in window object');
           setError('Could not initialize the scheduling widget. Please refresh the page.');
@@ -38,6 +40,11 @@ export function ConsultationForm() {
           setError('Could not initialize the scheduling widget. Please refresh the page.');
           setIsLoading(false);
           return;
+        }
+
+        // Clear any existing widgets first
+        while (calendarRef.current.firstChild) {
+          calendarRef.current.removeChild(calendarRef.current.firstChild);
         }
 
         console.log('Initializing Calendly widget with URL:', calendlyUrl);
@@ -59,16 +66,15 @@ export function ConsultationForm() {
     };
 
     const loadScript = () => {
-      if (isScriptLoaded) return;
+      if (scriptRef.current) return; // Prevent duplicate script loading
 
       const script = document.createElement('script');
       script.src = 'https://assets.calendly.com/assets/external/widget.js';
       script.async = true;
       script.onload = () => {
         console.log('Calendly script loaded successfully');
-        isScriptLoaded = true;
-        // Add a small delay to ensure Calendly is fully initialized
-        setTimeout(initializeCalendly, 1000);
+        // Wait for the script to be fully initialized
+        initializeTimeout = setTimeout(initializeCalendly, 1000);
       };
       script.onerror = (e) => {
         console.error('Failed to load Calendly script:', e);
@@ -86,11 +92,21 @@ export function ConsultationForm() {
 
     return () => {
       isMounted = false;
+      if (initializeTimeout) {
+        clearTimeout(initializeTimeout);
+      }
+      // Only remove the script if we created it
       if (scriptRef.current && document.body.contains(scriptRef.current)) {
         document.body.removeChild(scriptRef.current);
       }
+      // Clean up Calendly
+      if (calendarRef.current) {
+        while (calendarRef.current.firstChild) {
+          calendarRef.current.removeChild(calendarRef.current.firstChild);
+        }
+      }
     };
-  }, []);
+  }, []); // Empty dependency array to run only once
 
   const content = (
     <div className="relative">
