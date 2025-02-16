@@ -36,7 +36,6 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const { toast } = useToast();
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null); // Add state for preview URL
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery<CVReview[]>({
     queryKey: ["/api/cv-reviews"],
@@ -44,7 +43,6 @@ export default function DashboardPage() {
 
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
-      // Validate file type
       const allowedTypes = ['.pdf', '.doc', '.docx'];
       const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       if (!allowedTypes.includes(fileExtension)) {
@@ -77,9 +75,8 @@ export default function DashboardPage() {
     },
   });
 
-  // If user is not authenticated, we shouldn't show this page
   if (!user) {
-    return null; // The ProtectedRoute component will handle the redirect
+    return null;
   }
 
   return (
@@ -201,8 +198,8 @@ export default function DashboardPage() {
                     <TableRow>
                       <TableHead>Submitted On</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>File</TableHead>
                       <TableHead>Feedback</TableHead>
-                      <TableHead>Document</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -225,48 +222,32 @@ export default function DashboardPage() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {review.feedback || (
-                            <span className="text-muted-foreground">Pending review</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="space-x-2">
-                          <Button
-                            onClick={() => setPreviewUrl(review.fileUrl)}
-                            variant="link"
-                            size="sm"
-                          >
-                            View Original CV
-                          </Button>
-                          {review.status === "completed" && (
-                            <Button
-                              onClick={() => {
-                                if (!review.isPaid) {
+                          <span className="text-sm text-muted-foreground">
+                            {review.fileUrl}
+                          </span>
+                          {review.status === "completed" && !review.isPaid && (
+                            <div className="mt-1">
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                className="gap-2"
+                                onClick={() => {
                                   toast({
                                     title: "Payment Required",
                                     description: "Please complete the payment to access your professional CV review",
                                     variant: "default",
                                   });
-                                  // TODO: Implement Stripe payment flow
-                                  return;
-                                }
-                                setPreviewUrl(review.reviewedFileUrl);
-                              }}
-                              variant={review.isPaid ? "default" : "secondary"}
-                              size="sm"
-                              className={review.isPaid ? "bg-primary text-white hover:bg-primary/90" : ""}
-                            >
-                              {review.isPaid ? (
-                                <>
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  View Review
-                                </>
-                              ) : (
-                                <>
-                                  <Lock className="w-4 h-4 mr-2" />
-                                  Unlock Review ({formatPrice(calculateDiscountedPrice(9900, 70))})
-                                </>
-                              )}
-                            </Button>
+                                }}
+                              >
+                                <Lock className="w-4 h-4" />
+                                Unlock Review ({formatPrice(calculateDiscountedPrice(9900, 70))})
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {review.feedback || (
+                            <span className="text-muted-foreground">Pending review</span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -276,35 +257,6 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
-          {/* Preview Dialog */}
-          {previewUrl && (
-            <div className="fixed inset-0 z-50 bg-black/80">
-              <div className="fixed inset-4 bg-white rounded-lg shadow-xl flex flex-col">
-                <div className="p-4 border-b flex justify-between items-center">
-                  <h2 className="text-lg font-semibold">CV Preview</h2>
-                  <Button variant="ghost" size="sm" onClick={() => setPreviewUrl(null)}>
-                    Close
-                  </Button>
-                </div>
-                <div className="flex-1 p-4">
-                  {previewUrl.toLowerCase().endsWith('.pdf') ? (
-                    <embed
-                      src={window.location.origin + previewUrl}
-                      type="application/pdf"
-                      className="w-full h-full rounded border"
-                    />
-                  ) : (
-                    <iframe
-                      src={`https://docs.google.com/gview?url=${encodeURIComponent(window.location.origin + previewUrl)}&embedded=true`}
-                      title="CV Preview"
-                      className="w-full h-full rounded border"
-                      frameBorder="0"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </main>
     </div>
