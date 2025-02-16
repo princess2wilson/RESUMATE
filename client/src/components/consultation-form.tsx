@@ -11,7 +11,6 @@ export function ConsultationForm() {
 
   useEffect(() => {
     const calendlyUrl = import.meta.env.VITE_CALENDLY_URL;
-    console.log('Calendly URL:', calendlyUrl); // Debug log
 
     if (!calendlyUrl) {
       setError('Calendly URL is not configured');
@@ -43,20 +42,13 @@ export function ConsultationForm() {
 
         console.log('Initializing Calendly widget with URL:', calendlyUrl);
 
-        // Clear any existing widgets
-        while (calendarRef.current.firstChild) {
-          calendarRef.current.removeChild(calendarRef.current.firstChild);
-        }
-
-        // Initialize new widget
         Calendly.initInlineWidget({
           url: calendlyUrl,
           parentElement: calendarRef.current,
           prefill: {},
-          utm: {},
+          utm: {}
         });
 
-        console.log('Calendly widget initialized');
         setIsLoading(false);
         setError(null);
       } catch (err) {
@@ -75,7 +67,7 @@ export function ConsultationForm() {
       script.onload = () => {
         console.log('Calendly script loaded successfully');
         isScriptLoaded = true;
-        // Wait for the script to be fully initialized
+        // Add a small delay to ensure Calendly is fully initialized
         setTimeout(initializeCalendly, 1000);
       };
       script.onerror = (e) => {
@@ -109,7 +101,6 @@ export function ConsultationForm() {
       )}
       <div 
         ref={calendarRef}
-        className="calendly-inline-widget"
         style={{ minWidth: '320px', height: '700px' }} 
       />
       {isLoading && (
