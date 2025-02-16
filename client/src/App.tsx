@@ -12,7 +12,7 @@ import AdminLoginPage from "./pages/admin-login-page";
 import ResourceLibraryPage from "@/pages/resource-library-page";
 import ConsultationPage from "@/pages/consultation-page";
 import CVSubmissionPage from "@/pages/cv-submission-page";
-import { ProtectedRoute } from "./lib/protected-route";
+//import { ProtectedRoute } from "./lib/protected-route"; //Removed as per the edited code
 
 function App() {
   console.log("Current path:", window.location.pathname); // Debug logging
@@ -23,7 +23,7 @@ function App() {
         <Switch>
           {/* Admin routes first to ensure they take precedence */}
           <Route path="/admin/login" component={AdminLoginPage} />
-          <ProtectedRoute path="/admin" component={AdminPage} adminOnly />
+          <Route path="/admin" component={AdminPage} />
 
           {/* Regular application routes */}
           <Route path="/" component={HomePage} />
