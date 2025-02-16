@@ -11,5 +11,12 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Use connection pooling with Neon's pooler
+const connectionString = process.env.DATABASE_URL.replace('.us-east-1.aws', '-pooler.us-east-1.aws');
+export const pool = new Pool({ 
+  connectionString,
+  max: 10,
+  ssl: true,
+  idleTimeoutMillis: 10000
+});
 export const db = drizzle({ client: pool, schema });
