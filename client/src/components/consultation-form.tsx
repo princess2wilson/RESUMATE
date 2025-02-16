@@ -11,43 +11,45 @@ export function ConsultationForm() {
 
   useEffect(() => {
     const calendlyUrl = import.meta.env.VITE_CALENDLY_URL;
-    console.log('Calendly URL:', calendlyUrl); // Debug log
+    console.log('Current Calendly URL:', calendlyUrl); // Debug log
 
     if (!calendlyUrl) {
+      console.error('Calendly URL is missing from environment variables');
       setError('Calendly URL is not configured');
       setIsLoading(false);
       return;
     }
 
-    let isScriptLoaded = false;
     let isMounted = true;
 
     const initializeCalendly = () => {
       if (!isMounted) return;
 
       try {
+        console.log('Attempting to initialize Calendly widget...');
         const Calendly = (window as any).Calendly;
 
         if (!Calendly) {
-          console.error('Calendly not found in window object');
+          console.error('Calendly global object not found');
           setError('Could not initialize the scheduling widget. Please refresh the page.');
           setIsLoading(false);
           return;
         }
 
         if (!calendarRef.current) {
-          console.error('Calendar container not found');
+          console.error('Calendar container reference not found');
           setError('Could not initialize the scheduling widget. Please refresh the page.');
           setIsLoading(false);
           return;
         }
 
-        console.log('Initializing Calendly widget with URL:', calendlyUrl);
+        // Clean up any existing widget
+        calendarRef.current.innerHTML = '';
 
-        // Clear any existing widgets
-        if (calendarRef.current.firstChild) {
-          calendarRef.current.innerHTML = '';
-        }
+        console.log('Initializing Calendly widget with settings:', {
+          url: calendlyUrl,
+          parentElement: calendarRef.current
+        });
 
         Calendly.initInlineWidget({
           url: calendlyUrl,
@@ -56,26 +58,31 @@ export function ConsultationForm() {
           utm: {},
         });
 
+        console.log('Calendly widget initialized successfully');
         setIsLoading(false);
         setError(null);
       } catch (err) {
-        console.error('Error initializing Calendly widget:', err);
+        console.error('Error during Calendly initialization:', err);
         setError('Could not initialize the scheduling widget. Please try again later.');
         setIsLoading(false);
       }
     };
 
     const loadScript = () => {
-      if (isScriptLoaded || !isMounted) return;
+      if (!isMounted) return;
 
+      console.log('Loading Calendly script...');
       const script = document.createElement('script');
       script.src = 'https://assets.calendly.com/assets/external/widget.js';
       script.async = true;
       script.onload = () => {
         console.log('Calendly script loaded successfully');
-        isScriptLoaded = true;
-        // Wait for DOM and script to be fully ready
-        setTimeout(initializeCalendly, 1000);
+        // Give a moment for the script to fully initialize
+        setTimeout(() => {
+          if (isMounted) {
+            initializeCalendly();
+          }
+        }, 1500);
       };
       script.onerror = (e) => {
         console.error('Failed to load Calendly script:', e);
@@ -89,46 +96,45 @@ export function ConsultationForm() {
       scriptRef.current = script;
     };
 
-    // Ensure DOM is ready before loading script
-    if (document.readyState === 'complete') {
-      loadScript();
-    } else {
-      window.addEventListener('load', loadScript);
+    // Clean up any existing scripts first
+    if (scriptRef.current && document.body.contains(scriptRef.current)) {
+      document.body.removeChild(scriptRef.current);
     }
+
+    // Start loading process
+    loadScript();
 
     return () => {
       isMounted = false;
       if (scriptRef.current && document.body.contains(scriptRef.current)) {
         document.body.removeChild(scriptRef.current);
       }
-      // Clean up load event listener
-      window.removeEventListener('load', loadScript);
     };
   }, []);
 
-  const content = (
-    <div className="relative">
-      {error && (
-        <Alert variant="destructive" className="mb-4">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-      <div 
-        ref={calendarRef}
-        style={{ minWidth: '320px', height: '700px' }} 
-        className="calendly-inline-widget" // Add back the class for styling
-      />
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="text-center">
-            <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
-            <p className="text-lg font-medium">Loading calendar...</p>
-            <p className="text-sm text-muted-foreground">Please wait while we set up your booking experience</p>
+  return (
+    <ErrorBoundary>
+      <div className="relative">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        <div 
+          ref={calendarRef}
+          style={{ minWidth: '320px', height: '700px' }} 
+          className="calendly-inline-widget"
+        />
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+            <div className="text-center">
+              <Calendar className="w-12 h-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
+              <p className="text-lg font-medium">Loading calendar...</p>
+              <p className="text-sm text-muted-foreground">Please wait while we set up your booking experience</p>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
-
-  return <ErrorBoundary>{content}</ErrorBoundary>;
 }
