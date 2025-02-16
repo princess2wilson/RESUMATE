@@ -32,8 +32,7 @@ export function registerRoutes(app: Express): Server {
     // Added error handler
     handler: function (req, res) {
       return res.status(429).json({ error: 'Too Many Requests' });
-    },
-    trustProxy: true // Trust proxy for rate limiting
+    }
   });
 
   // Apply rate limiting to all routes
