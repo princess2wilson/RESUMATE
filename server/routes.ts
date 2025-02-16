@@ -9,9 +9,14 @@ import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 
 // Configure multer to store files with their original names
+const uploadsPath = path.resolve(process.cwd(), 'uploads');
 const storage_config = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/');
+    // Ensure uploads directory exists
+    if (!fs.existsSync(uploadsPath)) {
+      fs.mkdirSync(uploadsPath, { recursive: true });
+    }
+    cb(null, uploadsPath);
   },
   filename: function (req, file, cb) {
     // Keep the original filename but make it URL safe
@@ -26,16 +31,6 @@ export function registerRoutes(app: Express): Server {
   // Configure trust proxy for production environment
   if (app.get('env') === 'production') {
     app.set('trust proxy', 1);
-  }
-
-  // Configure uploads directory
-  const uploadsPath = path.resolve(process.cwd(), 'uploads');
-  console.log('Uploads directory path:', uploadsPath);
-
-  // Create uploads directory if it doesn't exist
-  if (!fs.existsSync(uploadsPath)) {
-    fs.mkdirSync(uploadsPath, { recursive: true });
-    console.log('Created uploads directory');
   }
 
   // Setup authentication first
@@ -78,7 +73,6 @@ export function registerRoutes(app: Express): Server {
 
   // Apply standard rate limiting to all routes after auth middleware
   app.use(standardLimiter);
-
 
   // CV Review routes (require authentication)
   const cvUpload = upload.single("file");
@@ -148,7 +142,11 @@ export function registerRoutes(app: Express): Server {
     const filename = req.params.filename;
     const filePath = path.join(uploadsPath, filename);
 
-    console.log('Attempting to download file:', filePath);
+    console.log('Attempting to download file:', {
+      requestedFile: filename,
+      fullPath: filePath,
+      exists: fs.existsSync(filePath)
+    });
 
     // Check if file exists
     if (!fs.existsSync(filePath)) {
@@ -156,7 +154,15 @@ export function registerRoutes(app: Express): Server {
       return res.status(404).json({ error: "File not found" });
     }
 
-    res.download(filePath);
+    res.download(filePath, filename, (err) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        // Only send error response if headers haven't been sent yet
+        if (!res.headersSent) {
+          res.status(500).json({ error: "Error downloading file" });
+        }
+      }
+    });
   });
 
   const httpServer = createServer(app);

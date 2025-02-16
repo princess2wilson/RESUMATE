@@ -240,16 +240,36 @@ export default function AdminPage() {
                           )}
                         </TableCell>
                         <TableCell>
-                          <Button variant="link" asChild className="p-0">
-                            <a
-                              href={`/api/cv-reviews/download/${review.fileUrl}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1"
-                            >
+                          <Button 
+                            variant="link" 
+                            asChild 
+                            className="p-0"
+                            onClick={() => {
+                              // Create full URL for the file
+                              const fileUrl = `/api/cv-reviews/download/${review.fileUrl}`;
+
+                              // Create a temporary link element
+                              const link = document.createElement('a');
+                              link.href = fileUrl;
+                              link.target = '_blank';
+                              link.download = review.fileUrl.split('-').slice(1).join('-'); // Remove timestamp prefix
+
+                              // Append to body, click, and remove
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+
+                              // Show loading toast
+                              toast({
+                                title: "Downloading CV",
+                                description: "Your download should begin shortly...",
+                              });
+                            }}
+                          >
+                            <div className="flex items-center gap-1">
                               <FileText className="w-4 h-4" />
                               View CV
-                            </a>
+                            </div>
                           </Button>
                         </TableCell>
                         <TableCell>
