@@ -43,8 +43,7 @@ export function registerRoutes(app: Express): Server {
     standardHeaders: true,
     legacyHeaders: false,
     skip: function(req) {
-      console.log('Authentication status:', req.isAuthenticated?.());
-      return req.isAuthenticated?.(); // Skip rate limiting for authenticated users
+      return req.user != null;
     },
     handler: function (req, res) {
       return res.status(429).json({ 
