@@ -18,12 +18,12 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { 
-  CheckCircle, 
-  Clock, 
-  Lock, 
-  FileText, 
-  Users, 
+import {
+  CheckCircle,
+  Clock,
+  Lock,
+  FileText,
+  Users,
   AlertCircle,
   Loader2,
   ArrowLeft,
@@ -220,7 +220,7 @@ export default function AdminPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge 
+                          <Badge
                             variant={review.status === "completed" ? "default" : "secondary"}
                             className={review.status === "completed" ? "bg-green-100 text-green-800" : ""}
                           >
@@ -241,9 +241,9 @@ export default function AdminPage() {
                         </TableCell>
                         <TableCell>
                           <Button variant="link" asChild className="p-0">
-                            <a 
+                            <a
                               href={`/api/cv-reviews/download/${review.fileUrl}`}
-                              target="_blank" 
+                              target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center gap-1"
                             >

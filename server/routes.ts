@@ -79,8 +79,6 @@ export function registerRoutes(app: Express): Server {
   // Apply standard rate limiting to all routes after auth middleware
   app.use(standardLimiter);
 
-  // Serve uploaded files statically without rate limiting for better performance
-  app.use('/uploads', express.static(uploadsPath));
 
   // CV Review routes (require authentication)
   const cvUpload = upload.single("file");
