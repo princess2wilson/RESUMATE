@@ -10,7 +10,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // Apply security headers
 app.use(securityHeaders);
-app.use(botProtection);
 
 // Apply rate limiting to login route
 app.use("/api/login", loginLimiter);

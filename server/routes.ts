@@ -45,14 +45,7 @@ export function registerRoutes(app: Express): Server {
   // CV Review routes (require authentication)
   const cvUpload = upload.single("file");
 
-  // Rate limit for CV uploads: 5 per hour per IP
-const uploadLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 5,
-  message: { error: "Too many upload attempts. Please try again later." }
-});
-
-app.post("/api/cv-review", uploadLimiter, (req, res, next) => {
+  app.post("/api/cv-review", (req, res, next) => {
     // Check authentication first
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
