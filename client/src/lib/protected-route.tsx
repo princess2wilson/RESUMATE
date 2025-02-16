@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route } from "wouter";
+import { Route, useLocation } from "wouter";
 
 export function ProtectedRoute({
   path,
@@ -12,6 +12,9 @@ export function ProtectedRoute({
   adminOnly?: boolean;
 }) {
   const { user, isLoading } = useAuth();
+  const [location, setLocation] = useLocation();
+
+  console.log("ProtectedRoute:", { path, adminOnly, user, location }); // Debug logging
 
   if (isLoading) {
     return (
@@ -24,10 +27,13 @@ export function ProtectedRoute({
   // For admin routes, redirect to admin login if not authenticated or not an admin
   if (adminOnly) {
     if (!user?.isAdmin) {
-      return <Redirect to="/admin/login" />;
+      console.log("Redirecting to admin login:", { user }); // Debug logging
+      setLocation("/admin/login");
+      return null;
     }
   } else if (!user) { // For regular protected routes
-    return <Redirect to="/auth" />;
+    setLocation("/auth");
+    return null;
   }
 
   return (

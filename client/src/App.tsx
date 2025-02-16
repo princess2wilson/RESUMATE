@@ -15,6 +15,8 @@ import CVSubmissionPage from "@/pages/cv-submission-page";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function App() {
+  console.log("Current path:", window.location.pathname); // Debug logging
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -26,10 +28,10 @@ function App() {
           {/* Regular application routes */}
           <Route path="/" component={HomePage} />
           <Route path="/auth" component={AuthPage} />
-          <ProtectedRoute path="/dashboard" component={DashboardPage} />
+          <Route path="/dashboard" component={DashboardPage} />
           <Route path="/resources" component={ResourceLibraryPage} />
           <Route path="/consultations" component={ConsultationPage} />
-          <ProtectedRoute path="/cv-submission" component={CVSubmissionPage} />
+          <Route path="/cv-submission" component={CVSubmissionPage} />
 
           {/* 404 route */}
           <Route component={NotFound} />
