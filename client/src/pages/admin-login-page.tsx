@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import {
@@ -135,16 +136,6 @@ export default function AdminLoginPage() {
               >
                 {loginMutation.isPending ? "Authenticating..." : "Access Admin Panel"}
               </Button>
-
-              <div className="text-center">
-                <Button
-                  variant="link"
-                  className="text-sm text-muted-foreground"
-                  onClick={() => setLocation("/")}
-                >
-                  Return to Homepage
-                </Button>
-              </div>
             </form>
           </Form>
         </CardContent>
