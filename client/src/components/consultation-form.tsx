@@ -5,83 +5,87 @@ import { ErrorBoundary } from "./error-boundary";
 
 export function ConsultationForm() {
   const scriptRef = useRef<HTMLScriptElement | null>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    const calendlyUrl = import.meta.env.VITE_CALENDLY_URL;
+
+    if (!calendlyUrl) {
+      setError('Calendly URL is not configured');
+      setIsLoading(false);
+      return;
+    }
+
+    let isScriptLoaded = false;
+    let isMounted = true;
 
     const initializeCalendly = () => {
+      if (!isMounted) return;
+
       try {
-        const parentElement = document.querySelector('.calendly-inline-widget');
-        if (!parentElement) {
-          console.error('Calendly parent element not found');
-          setError('Could not initialize the booking widget. Please refresh the page.');
+        const Calendly = (window as any).Calendly;
+        if (!Calendly) {
+          console.error('Calendly not found in window object');
+          setError('Could not initialize the scheduling widget. Please refresh the page.');
           setIsLoading(false);
           return;
         }
 
-        if (!(window as any).Calendly) {
-          console.error('Calendly not loaded');
-          setError('Could not load the scheduling widget. Please refresh the page.');
+        if (!calendarRef.current) {
+          console.error('Calendar container not found');
+          setError('Could not initialize the scheduling widget. Please refresh the page.');
           setIsLoading(false);
           return;
         }
 
-        // Ensure the Calendly object is fully loaded
-        setTimeout(() => {
-          try {
-            console.log('Initializing Calendly widget...');
-            (window as any).Calendly.initInlineWidget({
-              url: import.meta.env.VITE_CALENDLY_URL,
-              parentElement,
-              prefill: {},
-              utm: {}
-            });
-            console.log('Calendly widget initialized successfully');
-            setIsLoading(false);
-          } catch (err) {
-            console.error('Error initializing Calendly widget:', err);
-            setError('Could not initialize the booking widget. Please try again later.');
-            setIsLoading(false);
-          }
-        }, 1000); // Add a small delay to ensure everything is loaded
+        console.log('Initializing Calendly widget with URL:', calendlyUrl);
+
+        Calendly.initInlineWidget({
+          url: calendlyUrl,
+          parentElement: calendarRef.current,
+          prefill: {},
+          utm: {}
+        });
+
+        setIsLoading(false);
+        setError(null);
       } catch (err) {
-        console.error('Error in Calendly initialization:', err);
-        setError('Something went wrong. Please try again later.');
+        console.error('Error initializing Calendly widget:', err);
+        setError('Could not initialize the scheduling widget. Please try again later.');
         setIsLoading(false);
       }
     };
 
-    try {
-      // Load Calendly widget script
+    const loadScript = () => {
+      if (isScriptLoaded) return;
+
       const script = document.createElement('script');
-      script.src = "https://assets.calendly.com/assets/external/widget.js";
+      script.src = 'https://assets.calendly.com/assets/external/widget.js';
       script.async = true;
-      scriptRef.current = script;
-
-      // Initialize Calendly after script loads
       script.onload = () => {
-        console.log('Calendly script loaded');
-        initializeCalendly();
+        console.log('Calendly script loaded successfully');
+        isScriptLoaded = true;
+        // Add a small delay to ensure Calendly is fully initialized
+        setTimeout(initializeCalendly, 1000);
       };
-
       script.onerror = (e) => {
         console.error('Failed to load Calendly script:', e);
-        setError('Failed to load the scheduling widget. Please check your internet connection.');
-        setIsLoading(false);
+        if (isMounted) {
+          setError('Failed to load the scheduling widget. Please check your internet connection.');
+          setIsLoading(false);
+        }
       };
 
-      // Add script to document
       document.body.appendChild(script);
-    } catch (err) {
-      console.error('Error setting up Calendly:', err);
-      setError('Something went wrong. Please try again later.');
-      setIsLoading(false);
-    }
+      scriptRef.current = script;
+    };
+
+    loadScript();
 
     return () => {
-      // Cleanup: remove script only if it's still in document
+      isMounted = false;
       if (scriptRef.current && document.body.contains(scriptRef.current)) {
         document.body.removeChild(scriptRef.current);
       }
@@ -96,10 +100,9 @@ export function ConsultationForm() {
         </Alert>
       )}
       <div 
-        className="calendly-inline-widget" 
+        ref={calendarRef}
         style={{ minWidth: '320px', height: '700px' }} 
       />
-      {/* Loading state */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="text-center">
