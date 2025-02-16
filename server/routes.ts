@@ -29,18 +29,41 @@ export function registerRoutes(app: Express): Server {
   }
 
   // Configure rate limiting
-  const limiter = rateLimit({
+  const standardLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
     standardHeaders: true,
     legacyHeaders: false,
+    skip: function(req) {
+      return req.isAuthenticated(); // Skip rate limiting for authenticated users
+    },
     handler: function (req, res) {
-      return res.status(429).json({ error: 'Too Many Requests' });
+      return res.status(429).json({ 
+        error: 'Too Many Requests',
+        message: 'Please try again later or log in to get higher limits.'
+      });
     }
   });
 
-  // Apply rate limiting to all routes
-  app.use(limiter);
+  // Special limiter for file downloads and admin routes
+  const authenticatedLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 500, // Higher limit for authenticated users
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: function(req) {
+      return req.user?.isAdmin; // Skip rate limiting for admins
+    },
+    handler: function (req, res) {
+      return res.status(429).json({ 
+        error: 'Too Many Requests',
+        message: 'You have exceeded the rate limit. Please try again in a few minutes.'
+      });
+    }
+  });
+
+  // Apply standard rate limiting to all routes
+  app.use(standardLimiter);
 
   setupAuth(app);
 
@@ -54,13 +77,13 @@ export function registerRoutes(app: Express): Server {
     console.log('Created uploads directory');
   }
 
-  // Serve uploaded files statically
+  // Serve uploaded files statically without rate limiting for better performance
   app.use('/uploads', express.static(uploadsPath));
 
   // CV Review routes (require authentication)
   const cvUpload = upload.single("file");
 
-  app.post("/api/cv-review", (req, res, next) => {
+  app.post("/api/cv-review", authenticatedLimiter, (req, res, next) => {
     // Check authentication first
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
@@ -80,7 +103,7 @@ export function registerRoutes(app: Express): Server {
       try {
         const review = await storage.createCVReview({
           userId: req.user.id,
-          fileUrl: req.file.filename, // Store the generated filename
+          fileUrl: req.file.filename,
           status: "pending",
           feedback: null,
           createdAt: new Date().toISOString(),
@@ -107,19 +130,19 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  app.get("/api/cv-reviews", async (req, res) => {
+  app.get("/api/cv-reviews", authenticatedLimiter, async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const reviews = await storage.getCVReviews(req.user.id);
     res.json(reviews);
   });
 
-  app.get("/api/admin/cv-reviews", async (req, res) => {
+  app.get("/api/admin/cv-reviews", authenticatedLimiter, async (req, res) => {
     if (!req.isAuthenticated() || !req.user.isAdmin) return res.sendStatus(401);
     const reviews = await storage.getAllCVReviews();
     res.json(reviews);
   });
 
-  app.post("/api/admin/cv-reviews/:id/feedback", async (req, res) => {
+  app.post("/api/admin/cv-reviews/:id/feedback", authenticatedLimiter, async (req, res) => {
     if (!req.isAuthenticated() || !req.user.isAdmin) return res.sendStatus(401);
     const review = await storage.updateCVReview(
       parseInt(req.params.id),
@@ -128,7 +151,7 @@ export function registerRoutes(app: Express): Server {
     res.json(review);
   });
 
-  app.get("/api/cv-reviews/download/:filename", (req, res) => {
+  app.get("/api/cv-reviews/download/:filename", authenticatedLimiter, (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
