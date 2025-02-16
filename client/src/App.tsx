@@ -8,6 +8,7 @@ import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
 import DashboardPage from "@/pages/dashboard-page";
 import AdminPage from "@/pages/admin-page";
+import AdminLoginPage from "@/pages/admin-login-page";
 import ResourceLibraryPage from "@/pages/resource-library-page";
 import ConsultationPage from "@/pages/consultation-page";
 import CVSubmissionPage from "@/pages/cv-submission-page";
@@ -18,8 +19,9 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/admin/login" component={AdminLoginPage} />
       <ProtectedRoute path="/dashboard" component={DashboardPage} />
-      <ProtectedRoute path="/admin" component={AdminPage} />
+      <ProtectedRoute path="/admin" component={AdminPage} adminOnly />
       <Route path="/resources" component={ResourceLibraryPage} />
       <Route path="/consultations" component={ConsultationPage} />
       <ProtectedRoute path="/cv-submission" component={CVSubmissionPage} />
