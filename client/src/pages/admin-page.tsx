@@ -26,7 +26,7 @@ export default function AdminPage() {
   const [feedback, setFeedback] = useState<string>("");
   const [selectedReviewId, setSelectedReviewId] = useState<number | null>(null);
 
-  const { data: reviews } = useQuery<CVReview[]>({
+  const { data: reviews } = useQuery<(CVReview & { userEmail?: string; firstName?: string })[]>({
     queryKey: ["/api/admin/cv-reviews"],
   });
 
@@ -91,7 +91,7 @@ export default function AdminPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
-                  <TableHead>User ID</TableHead>
+                  <TableHead>User</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Promotional</TableHead>
                   <TableHead>File</TableHead>
@@ -102,9 +102,15 @@ export default function AdminPage() {
                 {reviews?.map((review) => (
                   <TableRow key={review.id}>
                     <TableCell>
-                      {format(new Date(review.createdAt), "PP")}
+                      {format(new Date(review.createdAt), "PPP")}
                     </TableCell>
-                    <TableCell>{review.userId}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{review.firstName || "N/A"}</span>
+                        <span className="text-sm text-muted-foreground">{review.userEmail || "N/A"}</span>
+                        <span className="text-xs text-muted-foreground">ID: {review.userId}</span>
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <Badge variant={review.status === "completed" ? "default" : "secondary"}>
                         {review.status === "completed" ? (
@@ -124,7 +130,11 @@ export default function AdminPage() {
                     </TableCell>
                     <TableCell>
                       <Button variant="link" asChild>
-                        <a href={review.fileUrl} target="_blank" rel="noopener">
+                        <a 
+                          href={`/api/cv-reviews/download/${review.fileUrl}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
                           View CV
                         </a>
                       </Button>

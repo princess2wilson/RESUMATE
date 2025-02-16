@@ -14,7 +14,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createCVReview(review: Omit<CVReview, "id">): Promise<CVReview>;
   getCVReviews(userId: number): Promise<CVReview[]>;
-  getAllCVReviews(): Promise<CVReview[]>;
+  getAllCVReviews(): Promise<(CVReview & { userEmail?: string; firstName?: string })[]>;
   updateCVReview(id: number, feedback: string): Promise<CVReview>;
   createAuditLog(logEntry: Omit<AuditLog, "id">): Promise<void>;
   // Add product-related methods
@@ -110,9 +110,17 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getAllCVReviews(): Promise<CVReview[]> {
+  async getAllCVReviews(): Promise<(CVReview & { userEmail?: string; firstName?: string })[]> {
     try {
-      return db.select().from(schema.cvReviews);
+      const reviews = await db
+        .select({
+          ...schema.cvReviews,
+          userEmail: schema.users.email,
+          firstName: schema.users.firstName,
+        })
+        .from(schema.cvReviews)
+        .leftJoin(schema.users, eq(schema.cvReviews.userId, schema.users.id));
+      return reviews;
     } catch (error) {
       console.error('Error getting all CV reviews:', error);
       throw new Error('Failed to get all CV reviews');

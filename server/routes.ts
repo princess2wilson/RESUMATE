@@ -114,6 +114,23 @@ export function registerRoutes(app: Express): Server {
     res.json(review);
   });
 
+  app.get("/api/cv-reviews/download/:filename", (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const filename = req.params.filename;
+    const filePath = path.join(uploadsPath, filename);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      console.error(`File not found: ${filePath}`);
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    res.download(filePath);
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
