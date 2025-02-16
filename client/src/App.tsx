@@ -20,31 +20,19 @@ function App() {
       <AuthProvider>
         <Switch>
           {/* Admin routes first to ensure they take precedence */}
-          <Route path="/admin/login">
-            <AdminLoginPage />
-          </Route>
+          <Route path="/admin/login" component={AdminLoginPage} />
           <ProtectedRoute path="/admin" component={AdminPage} adminOnly />
 
           {/* Regular application routes */}
-          <Route path="/">
-            <HomePage />
-          </Route>
-          <Route path="/auth">
-            <AuthPage />
-          </Route>
+          <Route path="/" component={HomePage} />
+          <Route path="/auth" component={AuthPage} />
           <ProtectedRoute path="/dashboard" component={DashboardPage} />
-          <Route path="/resources">
-            <ResourceLibraryPage />
-          </Route>
-          <Route path="/consultations">
-            <ConsultationPage />
-          </Route>
+          <Route path="/resources" component={ResourceLibraryPage} />
+          <Route path="/consultations" component={ConsultationPage} />
           <ProtectedRoute path="/cv-submission" component={CVSubmissionPage} />
 
           {/* 404 route */}
-          <Route>
-            <NotFound />
-          </Route>
+          <Route component={NotFound} />
         </Switch>
         <Toaster />
       </AuthProvider>
