@@ -29,6 +29,7 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  // Setup session configuration first
   const sessionSettings: session.SessionOptions = {
     secret: process.env.REPL_ID!,
     resave: false,
@@ -42,11 +43,15 @@ export function setupAuth(app: Express) {
     name: 'resumate.sid'
   };
 
+  // In production, enable secure cookies
   if (app.get("env") === "production") {
-    app.set("trust proxy", 1);
+    sessionSettings.cookie!.secure = true;
   }
 
+  // Initialize session middleware
   app.use(session(sessionSettings));
+
+  // Initialize Passport and restore authentication state from session
   app.use(passport.initialize());
   app.use(passport.session());
 

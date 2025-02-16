@@ -28,14 +28,28 @@ export function registerRoutes(app: Express): Server {
     app.set('trust proxy', 1);
   }
 
-  // Configure rate limiting
+  // Configure uploads directory
+  const uploadsPath = path.resolve(process.cwd(), 'uploads');
+  console.log('Uploads directory path:', uploadsPath);
+
+  // Create uploads directory if it doesn't exist
+  if (!fs.existsSync(uploadsPath)) {
+    fs.mkdirSync(uploadsPath, { recursive: true });
+    console.log('Created uploads directory');
+  }
+
+  // Setup authentication first
+  setupAuth(app);
+
+  // Now configure rate limiting after auth is set up
   const standardLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
     standardHeaders: true,
     legacyHeaders: false,
     skip: function(req) {
-      return req.isAuthenticated(); // Skip rate limiting for authenticated users
+      console.log('Authentication status:', req.isAuthenticated?.());
+      return req.isAuthenticated?.(); // Skip rate limiting for authenticated users
     },
     handler: function (req, res) {
       return res.status(429).json({ 
@@ -62,20 +76,8 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Apply standard rate limiting to all routes
+  // Apply standard rate limiting to all routes after auth middleware
   app.use(standardLimiter);
-
-  setupAuth(app);
-
-  // Configure uploads directory
-  const uploadsPath = path.resolve(process.cwd(), 'uploads');
-  console.log('Uploads directory path:', uploadsPath);
-
-  // Create uploads directory if it doesn't exist
-  if (!fs.existsSync(uploadsPath)) {
-    fs.mkdirSync(uploadsPath, { recursive: true });
-    console.log('Created uploads directory');
-  }
 
   // Serve uploaded files statically without rate limiting for better performance
   app.use('/uploads', express.static(uploadsPath));
@@ -117,17 +119,6 @@ export function registerRoutes(app: Express): Server {
         res.status(500).json({ error: 'Failed to create CV review' });
       }
     });
-  });
-
-  // Product routes (no auth required)
-  app.get("/api/products", async (_req, res) => {
-    try {
-      const products = await storage.getProducts();
-      res.json(products);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      res.status(500).json({ error: 'Failed to fetch products' });
-    }
   });
 
   app.get("/api/cv-reviews", authenticatedLimiter, async (req, res) => {
