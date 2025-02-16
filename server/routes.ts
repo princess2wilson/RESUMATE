@@ -8,7 +8,19 @@ import path from 'path';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 
-const upload = multer({ dest: "uploads/" });
+// Configure multer to store files with their original names
+const storage_config = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    // Keep the original filename but make it URL safe
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    cb(null, Date.now() + '-' + safeName);
+  }
+});
+
+const upload = multer({ storage: storage_config });
 
 export function registerRoutes(app: Express): Server {
   // Configure trust proxy for production environment
@@ -42,6 +54,9 @@ export function registerRoutes(app: Express): Server {
     console.log('Created uploads directory');
   }
 
+  // Serve uploaded files statically
+  app.use('/uploads', express.static(uploadsPath));
+
   // CV Review routes (require authentication)
   const cvUpload = upload.single("file");
 
@@ -63,10 +78,9 @@ export function registerRoutes(app: Express): Server {
       }
 
       try {
-        const fileName = req.file.originalname || path.basename(req.file.path);
         const review = await storage.createCVReview({
           userId: req.user.id,
-          fileUrl: fileName, // Store just the filename
+          fileUrl: req.file.filename, // Store the generated filename
           status: "pending",
           feedback: null,
           createdAt: new Date().toISOString(),
@@ -121,6 +135,8 @@ export function registerRoutes(app: Express): Server {
 
     const filename = req.params.filename;
     const filePath = path.join(uploadsPath, filename);
+
+    console.log('Attempting to download file:', filePath);
 
     // Check if file exists
     if (!fs.existsSync(filePath)) {
