@@ -157,10 +157,13 @@ export function registerRoutes(app: Express): Server {
     }
 
     const filename = req.params.filename;
-    const filePath = path.join(uploadsPath, filename);
+    // Remove any "uploads/" prefix if it exists in the filename
+    const cleanFilename = filename.replace(/^uploads[\/\\]/, '');
+    const filePath = path.join(uploadsPath, cleanFilename);
 
     console.log('File download request:', {
-      filename,
+      requestedFilename: filename,
+      cleanFilename,
       filePath,
       exists: fs.existsSync(filePath),
       uploadsPath,
@@ -174,7 +177,7 @@ export function registerRoutes(app: Express): Server {
     }
 
     // Use res.download to properly send the file
-    res.download(filePath, filename, (err) => {
+    res.download(filePath, cleanFilename, (err) => {
       if (err) {
         console.error('Error downloading file:', err);
         if (!res.headersSent) {
