@@ -37,6 +37,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import path from 'path';
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -251,15 +252,39 @@ export default function AdminPage() {
                                   description: "Starting download...",
                                 });
 
-                                // Directly navigate to download URL
-                                window.location.href = `/api/cv-reviews/download/${review.fileUrl}`;
+                                // Use fetch to get the file and trigger download
+                                fetch(`/api/cv-reviews/download/${review.fileUrl}`)
+                                  .then(response => {
+                                    if (!response.ok) throw new Error('Download failed');
+                                    return response.blob();
+                                  })
+                                  .then(blob => {
+                                    const url = window.URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.style.display = 'none';
+                                    a.href = url;
+                                    // Use a more friendly filename
+                                    a.download = `CV-${review.firstName || 'User'}-${format(new Date(review.createdAt), 'yyyy-MM-dd')}${path.extname(review.fileUrl)}`;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    window.URL.revokeObjectURL(url);
+                                    document.body.removeChild(a);
 
-                                toast({
-                                  title: "Download Started",
-                                  description: "Your CV file download has started.",
-                                });
+                                    toast({
+                                      title: "Download Complete",
+                                      description: "The CV has been downloaded successfully.",
+                                    });
+                                  })
+                                  .catch(error => {
+                                    console.error('Error downloading file:', error);
+                                    toast({
+                                      title: "Download Failed",
+                                      description: "There was an error downloading the file. Please try again.",
+                                      variant: "destructive"
+                                    });
+                                  });
                               } catch (error) {
-                                console.error('Error downloading file:', error);
+                                console.error('Error initiating download:', error);
                                 toast({
                                   title: "Download Failed",
                                   description: "There was an error downloading the file. Please try again.",
