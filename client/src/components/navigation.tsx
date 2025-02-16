@@ -42,24 +42,13 @@ export function Navigation() {
           >
             <Link href="/dashboard">DASHBOARD</Link>
           </Button>
-          {user.isAdmin ? (
+          {user.isAdmin && (
             <Button 
               variant="outline"
               className="hover:border-primary/30 transition-colors duration-200"
               asChild
             >
               <Link href="/admin">ADMIN PANEL</Link>
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              className="hover:bg-primary/5 transition-colors duration-200"
-              asChild
-            >
-              <Link href="/admin/login">
-                <Shield className="w-4 h-4 mr-2" />
-                ADMIN LOGIN
-              </Link>
             </Button>
           )}
           <Button
@@ -75,16 +64,6 @@ export function Navigation() {
         </>
       ) : (
         <>
-          <Button
-            variant="ghost"
-            className="hover:bg-primary/5 transition-colors duration-200"
-            asChild
-          >
-            <Link href="/admin/login">
-              <Shield className="w-4 h-4 mr-2" />
-              ADMIN LOGIN
-            </Link>
-          </Button>
           <Button 
             className="bg-primary hover:bg-primary/90 transition-colors duration-200 shadow-sm hover:shadow-md"
             asChild
